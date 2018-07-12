@@ -1,6 +1,6 @@
 package com.twitterscraper;
 
-import twitter4j.Query;
+import com.twitterscraper.twitter.utils.QueryBuilder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,12 +10,13 @@ public class Main {
     public static void main(String[] args) {
         new TwitterScraper()
                 .setQueryList(new ArrayList<>(Arrays.asList(
-                        new Query("@nasa"),
-                        new Query("#maga")
+                        new QueryBuilder()
+                                .add("#maga")
+                                .setQueryLimit(10)
+                                .setIncludeRetweets(true)
+                                .build()
                 )))
-                .setTweetHandler(tweet -> {
-                    // TODO save to database
-                })
+                .setTweetHandler(TwitterScraper::printTweet)
                 .run();
     }
 

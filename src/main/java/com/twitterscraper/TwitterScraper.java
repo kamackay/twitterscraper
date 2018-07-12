@@ -21,7 +21,8 @@ class TwitterScraper {
         return new TwitterFactory().getInstance();
     }
 
-    TwitterScraper run() {
+    void run() {
+        checkLimits();
         queries.forEach(query -> {
             try {
                 QueryResult result;
@@ -31,7 +32,7 @@ class TwitterScraper {
                 e.printStackTrace();
             }
         });
-        return this;
+        // return this;
     }
 
     TwitterScraper setTweetHandler(Consumer<Status> handleTweet) {
@@ -45,17 +46,33 @@ class TwitterScraper {
     }
 
     private void handleTweet(Status tweet) {
-        Optional.ofNullable(handleTweet).orElse(this::printTweet).accept(tweet);
+        Optional.ofNullable(handleTweet).orElse(TwitterScraper::printTweet).accept(tweet);
     }
 
-    private void printTweet(Status tweet) {
+    static void printTweet(Status tweet) {
         System.out.println(String.format("@%s - %s (%s)",
                 tweet.getUser().getScreenName(),
                 tweet.getText(),
                 getTweetUrl(tweet)));
     }
 
-    private String getTweetUrl(@NotNull Status tweet) {
+    private static String getTweetUrl(@NotNull Status tweet) {
         return "https://twitter.com/" + tweet.getUser().getScreenName() + "/status/" + tweet.getId();
+    }
+
+    private void checkLimits() {
+        try {
+            twitter.getRateLimitStatus().forEach((key, value) -> {
+                if (value.getRemaining() != value.getLimit()) {
+                    System.out.println(String.format("%s: %d/%d - %d seconds",
+                            key,
+                            value.getRemaining(),
+                            value.getLimit(),
+                            value.getSecondsUntilReset()));
+                }
+            });
+        } catch (TwitterException e) {
+            e.printStackTrace();
+        }
     }
 }
