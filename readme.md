@@ -1,3 +1,6 @@
 # Twitter Scraper
 
-// TODO write readme
+### TODO:
+- Save results to database
+- Run as continuous service
+- Webpage to view data
