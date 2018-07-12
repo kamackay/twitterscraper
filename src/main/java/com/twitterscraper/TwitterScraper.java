@@ -27,6 +27,9 @@ class TwitterScraper {
                 .getInstance();
     }
 
+    /**
+     * Run the configured Queries and handle the results
+     */
     void run() {
         checkLimits();
         queries.forEach(query -> {

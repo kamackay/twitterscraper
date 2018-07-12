@@ -1,5 +1,7 @@
 package com.twitterscraper.twitter.utils;
 
+import com.google.gson.Gson;
+import twitter4j.Place;
 import twitter4j.Status;
 
 public class TweetPrinter {
@@ -18,7 +20,11 @@ public class TweetPrinter {
                 getTweetUrl());
     }
 
-    String getText() {
+    public String toJson() {
+        return new Gson().toJson(tweet);
+    }
+
+    public String getText() {
         String text = tweet.getRetweetedStatus() == null ?
                 tweet.getText() :
                 tweet.getRetweetedStatus().getText();
@@ -27,5 +33,9 @@ public class TweetPrinter {
 
     private String getTweetUrl() {
         return "https://twitter.com/" + tweet.getUser().getScreenName() + "/status/" + tweet.getId();
+    }
+
+    private Place getPlace() {
+        return tweet.getPlace();
     }
 }

@@ -1,11 +1,9 @@
 {
   "queries": [
     {
-      "mentions": ["@cnn"],
-      "hashtags": [],
-      "quotes": [
-        "Trump sucks"
-      ],
+      "mentions": [],
+      "hashtags": ["maga"],
+      "quotes": ["christ is lord"],
       "includeRetweets": false
     }
   ]

@@ -1,14 +1,26 @@
 package com.twitterscraper.logging;
 
+import java.io.File;
+import java.io.FileWriter;
+
 /**
  * Placeholder logging class
  */
 public class Logger {
 
     private final Class classname;
+    private static final String filename = "output.log";
 
     public Logger(Class classname) {
         this.classname = classname;
+        File f = new File(filename);
+        if (f.exists()) {
+            try {
+                f.delete();
+            } catch (Exception e) {
+                // ?
+            }
+        }
     }
 
     /**
@@ -18,9 +30,15 @@ public class Logger {
      */
     public void log(String s) {
         // TODO make this an actual logger
-        System.out.println(String.format("%s - %s",
+        String text = String.format("%s - %s",
                 classname.getName(),
-                s));
+                s);
+        System.out.println(text);
+        try (FileWriter fw = new FileWriter(filename, true)) {
+            fw.append(text + "\n");
+        } catch (Exception e) {
+            // ?
+        }
     }
 
     /**
