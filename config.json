@@ -1,10 +1,10 @@
 {
   "queries": [
     {
-      "hashtags": [
-        "maga",
-        "trump",
-        "winning"
+      "mentions": [],
+      "hashtags": [],
+      "quotes": [
+        "Trump is an asshole"
       ],
       "includeRetweets": false
     }

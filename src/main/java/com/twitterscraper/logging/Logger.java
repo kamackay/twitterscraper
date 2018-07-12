@@ -1,5 +1,8 @@
 package com.twitterscraper.logging;
 
+/**
+ * Placeholder logging class
+ */
 public class Logger {
 
     private final Class classname;
@@ -8,6 +11,11 @@ public class Logger {
         this.classname = classname;
     }
 
+    /**
+     * Default logging function
+     *
+     * @param s - String to log
+     */
     public void log(String s) {
         // TODO make this an actual logger
         System.out.println(String.format("%s - %s",
@@ -15,9 +23,15 @@ public class Logger {
                 s));
     }
 
-    public void e(Throwable e){
-        for (StackTraceElement element : e.getStackTrace()){
-            this.log(element.toString());
+    /**
+     * Log the given exception
+     *
+     * @param e - Exception to log
+     */
+    public void e(Throwable e) {
+        log(e.getMessage());
+        for (StackTraceElement element : e.getStackTrace()) {
+            log(element.toString());
         }
     }
 }

@@ -7,6 +7,9 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkState;
 
+/**
+ * Builder style class to generate a Twitter Query
+ */
 public class QueryBuilder {
 
     private final StringBuilder queryString;

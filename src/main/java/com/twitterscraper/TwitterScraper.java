@@ -29,6 +29,9 @@ class TwitterScraper {
             try {
                 QueryResult result;
                 result = twitter.search(query);
+                logger.log("");
+                logger.log("Results for: " + query.toString());
+                logger.log("");
                 result.getTweets().forEach(this::handleTweet);
             } catch (Exception e) {
                 logger.e(e);
