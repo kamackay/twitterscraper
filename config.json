@@ -1,0 +1,12 @@
+{
+  "queries": [
+    {
+      "hashtags": [
+        "maga",
+        "trump",
+        "winning"
+      ],
+      "includeRetweets": false
+    }
+  ]
+}

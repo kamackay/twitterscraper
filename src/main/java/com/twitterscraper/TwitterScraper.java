@@ -1,6 +1,7 @@
 package com.twitterscraper;
 
-import com.sun.istack.internal.NotNull;
+import com.twitterscraper.logging.Logger;
+import com.twitterscraper.twitter.utils.TweetPrinter;
 import twitter4j.*;
 
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.function.Consumer;
 
 class TwitterScraper {
 
+    private static final Logger logger = new Logger(TwitterScraper.class);
     private List<Query> queries;
     private final Twitter twitter;
     private Consumer<Status> handleTweet;
@@ -29,7 +31,7 @@ class TwitterScraper {
                 result = twitter.search(query);
                 result.getTweets().forEach(this::handleTweet);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.e(e);
             }
         });
         // return this;
@@ -50,21 +52,14 @@ class TwitterScraper {
     }
 
     static void printTweet(Status tweet) {
-        System.out.println(String.format("@%s - %s (%s)",
-                tweet.getUser().getScreenName(),
-                tweet.getText(),
-                getTweetUrl(tweet)));
-    }
-
-    private static String getTweetUrl(@NotNull Status tweet) {
-        return "https://twitter.com/" + tweet.getUser().getScreenName() + "/status/" + tweet.getId();
+        logger.log(new TweetPrinter(tweet).toString());
     }
 
     private void checkLimits() {
         try {
             twitter.getRateLimitStatus().forEach((key, value) -> {
                 if (value.getRemaining() != value.getLimit()) {
-                    System.out.println(String.format("%s: %d/%d - %d seconds",
+                    logger.log(String.format("%s: %d/%d - %d seconds",
                             key,
                             value.getRemaining(),
                             value.getLimit(),
@@ -72,7 +67,8 @@ class TwitterScraper {
                 }
             });
         } catch (TwitterException e) {
-            e.printStackTrace();
+            logger.e(e);
         }
+        logger.log("");
     }
 }

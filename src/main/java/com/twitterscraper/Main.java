@@ -1,23 +1,29 @@
 package com.twitterscraper;
 
-import com.twitterscraper.twitter.utils.QueryBuilder;
+import com.google.gson.Gson;
+import com.twitterscraper.logging.Logger;
+import com.twitterscraper.model.Config;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 
 public class Main {
 
+    private static final Logger logger = new Logger(Main.class);
+
     public static void main(String[] args) {
-        new TwitterScraper()
-                .setQueryList(new ArrayList<>(Arrays.asList(
-                        new QueryBuilder()
-                                .add("#maga")
-                                .setQueryLimit(10)
-                                .setIncludeRetweets(true)
-                                .build()
-                )))
-                .setTweetHandler(TwitterScraper::printTweet)
-                .run();
+        try {
+            new TwitterScraper()
+                    .setQueryList(getConfig().convertQueries())
+                    .setTweetHandler(TwitterScraper::printTweet)
+                    .run();
+        } catch (Exception e){
+            logger.e(e);
+        }
+    }
+
+    private static Config getConfig() throws FileNotFoundException {
+        return new Gson().fromJson(new FileReader("config.json"), Config.class);
     }
 
 }
