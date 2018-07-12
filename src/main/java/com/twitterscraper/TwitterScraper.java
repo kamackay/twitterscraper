@@ -3,6 +3,7 @@ package com.twitterscraper;
 import com.twitterscraper.logging.Logger;
 import com.twitterscraper.twitter.utils.TweetPrinter;
 import twitter4j.*;
+import twitter4j.conf.ConfigurationBuilder;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +21,10 @@ class TwitterScraper {
     }
 
     private Twitter getTwitter() {
-        return new TwitterFactory().getInstance();
+        return new TwitterFactory(new ConfigurationBuilder()
+                .setTweetModeExtended(true)
+                .build())
+                .getInstance();
     }
 
     void run() {
@@ -60,6 +64,7 @@ class TwitterScraper {
 
     private void checkLimits() {
         try {
+            logger.log("Checking tweets as " + twitter.getScreenName());
             twitter.getRateLimitStatus().forEach((key, value) -> {
                 if (value.getRemaining() != value.getLimit()) {
                     logger.log(String.format("%s: %d/%d - %d seconds",

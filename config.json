@@ -1,10 +1,10 @@
 {
   "queries": [
     {
-      "mentions": [],
+      "mentions": ["@cnn"],
       "hashtags": [],
       "quotes": [
-        "Trump is an asshole"
+        "Trump sucks"
       ],
       "includeRetweets": false
     }

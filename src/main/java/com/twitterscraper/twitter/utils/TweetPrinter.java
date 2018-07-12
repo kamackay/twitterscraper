@@ -19,7 +19,10 @@ public class TweetPrinter {
     }
 
     String getText() {
-        return tweet.getText().replace("\n", "\\n");
+        String text = tweet.getRetweetedStatus() == null ?
+                tweet.getText() :
+                tweet.getRetweetedStatus().getText();
+        return text.replace("\n", "\\n");
     }
 
     private String getTweetUrl() {
