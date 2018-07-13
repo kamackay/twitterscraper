@@ -127,10 +127,12 @@ class TwitterScraper {
     }
 
     private void resetLimitMap() {
+        if (limitMap == null) limitMap = new HashMap<>();
         try {
-            limitMap = twitter.getRateLimitStatus();
+            limitMap.clear();
+            limitMap.putAll(twitter.getRateLimitStatus());
         } catch (TwitterException e) {
-            limitMap = new HashMap<>();
+            limitMap.clear();
         }
     }
 
