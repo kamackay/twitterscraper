@@ -23,7 +23,7 @@ public class Config {
                 .addMentions(query.mentions)
                 .addQuotes(query.quotes)
                 .addHashtags(query.hashtags)
-                .setQueryLimit(100)
+                .setQueryLimit(1)
                 .setIncludeRetweets(query.includeRetweets);
     }
 

@@ -1,0 +1,180 @@
+[
+	{
+		"createdAt": "Jul 13, 2018 7:24:33 AM",
+		"id": 1017731502229073921,
+		"text":
+			"As usual we can thank one of the #crookedmedia guys, @tvietor08 for great reporting, awareness of the this awful trump presidency. Thank you, #voteblue2018 https://t.co/andkyyhhRi",
+		"displayTextRangeStart": 0,
+		"displayTextRangeEnd": 155,
+		"source":
+			"\u003ca href\u003d\"http://twitter.com/download/iphone\" rel\u003d\"nofollow\"\u003eTwitter for iPhone\u003c/a\u003e",
+		"isTruncated": false,
+		"inReplyToStatusId": -1,
+		"inReplyToUserId": -1,
+		"isFavorited": false,
+		"isRetweeted": false,
+		"favoriteCount": 0,
+		"retweetCount": 0,
+		"isPossiblySensitive": false,
+		"lang": "en",
+		"contributorsIDs": [],
+		"userMentionEntities": [
+			{
+				"name": "Tommy Vietor",
+				"screenName": "TVietor08",
+				"id": 155784594,
+				"start": 53,
+				"end": 63
+			}
+		],
+		"urlEntities": [
+			{
+				"url": "https://t.co/andkyyhhRi",
+				"expandedURL":
+					"https://twitter.com/tvietor08/status/1017631865883070464",
+				"displayURL": "twitter.com/tvietor08/stat…",
+				"start": 156,
+				"end": 179
+			}
+		],
+		"hashtagEntities": [
+			{ "text": "crookedmedia", "start": 33, "end": 46 },
+			{ "text": "voteblue2018", "start": 142, "end": 155 }
+		],
+		"mediaEntities": [],
+		"symbolEntities": [],
+		"currentUserRetweetId": -1,
+		"user": {
+			"id": 975516937546555392,
+			"name": "Linda Steinworth",
+			"screenName": "Lindastillwater",
+			"location": "",
+			"description": "Artist, feminist,",
+			"descriptionURLEntities": [],
+			"isContributorsEnabled": false,
+			"profileImageUrl":
+				"http://pbs.twimg.com/profile_images/975523266793230338/GN2moMXu_normal.jpg",
+			"profileImageUrlHttps":
+				"https://pbs.twimg.com/profile_images/975523266793230338/GN2moMXu_normal.jpg",
+			"isDefaultProfileImage": false,
+			"isProtected": false,
+			"followersCount": 16,
+			"profileBackgroundColor": "F5F8FA",
+			"profileTextColor": "333333",
+			"profileLinkColor": "1DA1F2",
+			"profileSidebarFillColor": "DDEEF6",
+			"profileSidebarBorderColor": "C0DEED",
+			"profileUseBackgroundImage": true,
+			"isDefaultProfile": true,
+			"showAllInlineMedia": false,
+			"friendsCount": 101,
+			"createdAt": "Mar 18, 2018 7:38:56 PM",
+			"favouritesCount": 505,
+			"utcOffset": -1,
+			"profileBackgroundTiled": false,
+			"lang": "en",
+			"statusesCount": 799,
+			"isGeoEnabled": false,
+			"isVerified": false,
+			"translator": false,
+			"listedCount": 0,
+			"isFollowRequestSent": false
+		},
+		"quotedStatus": {
+			"createdAt": "Jul 13, 2018 12:48:38 AM",
+			"id": 1017631865883070464,
+			"text":
+				"Watch @RepRaskin brilliantly dismantle this farce of a hearing https://t.co/yI1SkDOjQZ",
+			"displayTextRangeStart": 0,
+			"displayTextRangeEnd": 62,
+			"source":
+				"\u003ca href\u003d\"http://twitter.com/download/iphone\" rel\u003d\"nofollow\"\u003eTwitter for iPhone\u003c/a\u003e",
+			"isTruncated": false,
+			"inReplyToStatusId": -1,
+			"inReplyToUserId": -1,
+			"isFavorited": false,
+			"isRetweeted": false,
+			"favoriteCount": 4481,
+			"retweetCount": 1063,
+			"isPossiblySensitive": false,
+			"lang": "en",
+			"contributorsIDs": [],
+			"userMentionEntities": [
+				{
+					"name": "Rep. Jamie Raskin",
+					"screenName": "RepRaskin",
+					"id": 806906355214852096,
+					"start": 6,
+					"end": 16
+				}
+			],
+			"urlEntities": [
+				{
+					"url": "https://t.co/yI1SkDOjQZ",
+					"expandedURL":
+						"https://twitter.com/girlsreallyrule/status/1017543754910224385",
+					"displayURL": "twitter.com/girlsreallyrul…",
+					"start": 63,
+					"end": 86
+				}
+			],
+			"hashtagEntities": [],
+			"mediaEntities": [],
+			"symbolEntities": [],
+			"currentUserRetweetId": -1,
+			"user": {
+				"id": 155784594,
+				"name": "Tommy Vietor",
+				"screenName": "TVietor08",
+				"location": "Los Angeles, CA",
+				"description":
+					"Cohost of Pod Save America. Host of Pod Save the World. Founder of Crooked Media. Former NSC spokesman for President Obama. Writer of long bios.",
+				"descriptionURLEntities": [],
+				"urlEntity": {
+					"url": "https://t.co/lIjQRGCmP2",
+					"expandedURL": "http://go.crooked.com/zRMpXY",
+					"displayURL": "go.crooked.com/zRMpXY",
+					"start": 0,
+					"end": 23
+				},
+				"isContributorsEnabled": false,
+				"profileImageUrl":
+					"http://pbs.twimg.com/profile_images/1007625403240886274/yltpz123_normal.jpg",
+				"profileImageUrlHttps":
+					"https://pbs.twimg.com/profile_images/1007625403240886274/yltpz123_normal.jpg",
+				"isDefaultProfileImage": false,
+				"url": "https://t.co/lIjQRGCmP2",
+				"isProtected": false,
+				"followersCount": 351339,
+				"profileBackgroundColor": "C0DEED",
+				"profileTextColor": "333333",
+				"profileLinkColor": "1DA1F2",
+				"profileSidebarFillColor": "DDEEF6",
+				"profileSidebarBorderColor": "C0DEED",
+				"profileUseBackgroundImage": true,
+				"isDefaultProfile": true,
+				"showAllInlineMedia": false,
+				"friendsCount": 1145,
+				"createdAt": "Jun 14, 2010 10:33:30 PM",
+				"favouritesCount": 13454,
+				"utcOffset": -1,
+				"profileBackgroundImageUrl":
+					"http://abs.twimg.com/images/themes/theme1/bg.png",
+				"profileBackgroundImageUrlHttps":
+					"https://abs.twimg.com/images/themes/theme1/bg.png",
+				"profileBannerImageUrl":
+					"https://pbs.twimg.com/profile_banners/155784594/1476809921",
+				"profileBackgroundTiled": false,
+				"lang": "en",
+				"statusesCount": 24806,
+				"isGeoEnabled": false,
+				"isVerified": true,
+				"translator": false,
+				"listedCount": 4034,
+				"isFollowRequestSent": false
+			},
+			"quotedStatusId": 1017543754910224385
+		},
+		"quotedStatusId": 1017631865883070464
+	}
+]

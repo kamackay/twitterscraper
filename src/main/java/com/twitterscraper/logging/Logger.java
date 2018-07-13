@@ -1,7 +1,11 @@
 package com.twitterscraper.logging;
 
+import com.google.gson.Gson;
+
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 
 /**
  * Placeholder logging class
@@ -10,9 +14,11 @@ public class Logger {
 
     private final Class classname;
     private static final String filename = "output.log";
+    private final Gson gson;
 
     public Logger(Class classname) {
         this.classname = classname;
+        this.gson = new Gson();
         File f = new File(filename);
         if (f.exists()) {
             try {
@@ -50,6 +56,19 @@ public class Logger {
         log(e.getMessage());
         for (StackTraceElement element : e.getStackTrace()) {
             log(element.toString());
+        }
+    }
+
+    /**
+     * Write the given object to a file - Json encoded
+     *
+     * @param o        - Object to json encode
+     * @param filename - name of the file to write the object to
+     * @throws IOException If there is an issue writing to the file
+     */
+    public void json(Object o, String filename) throws IOException {
+        try (Writer writer = new FileWriter(filename)) {
+            gson.toJson(o, writer);
         }
     }
 }

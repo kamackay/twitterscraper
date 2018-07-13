@@ -5,6 +5,8 @@ import com.twitterscraper.twitter.utils.TweetPrinter;
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -15,9 +17,11 @@ class TwitterScraper {
     private List<Query> queries;
     private final Twitter twitter;
     private Consumer<Status> handleTweet;
+    private List<Status> tweets;
 
     TwitterScraper() {
         twitter = getTwitter();
+        tweets = new ArrayList<>();
     }
 
     private Twitter getTwitter() {
@@ -44,6 +48,11 @@ class TwitterScraper {
                 logger.e(e);
             }
         });
+        try {
+            logger.json(tweets, "tweets.json");
+        } catch (IOException e) {
+            logger.e(e);
+        }
         // return this;
     }
 
@@ -58,6 +67,7 @@ class TwitterScraper {
     }
 
     private void handleTweet(Status tweet) {
+        tweets.add(tweet);
         Optional.ofNullable(handleTweet).orElse(TwitterScraper::printTweet).accept(tweet);
     }
 
