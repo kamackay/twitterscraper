@@ -1,8 +1,8 @@
 {
   "queries": [
     {
-      "mentions": [],
-      "hashtags": ["praisejesus", "maga"],
+      "mentions": ["nasa"],
+      "hashtags": [],
       "quotes": [],
       "includeRetweets": false
     }

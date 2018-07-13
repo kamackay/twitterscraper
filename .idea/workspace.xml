@@ -2,14 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="88753f7e-6fa8-45a9-9b1f-4b5c47ff8361" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/dictionaries/keithm.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/twitterscraper/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/twitterscraper/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/twitterscraper/TwitterScraper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/twitterscraper/TwitterScraper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/twitterscraper/model/Config.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/twitterscraper/model/Config.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/twitterscraper/twitter/utils/QueryBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/twitterscraper/twitter/utils/QueryBuilder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tweets.json" beforeDir="false" afterPath="$PROJECT_DIR$/tweets.json" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -36,7 +29,7 @@
           <file leaf-file-name="TwitterScraper.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/main/java/com/twitterscraper/TwitterScraper.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="641">
+                <state relative-caret-position="305">
                   <caret line="83" selection-start-line="83" selection-end-line="83" />
                   <folding>
                     <element signature="imports" expanded="true" />
@@ -66,7 +59,7 @@
             <entry file="file://$PROJECT_DIR$/config.json">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="64">
-                  <caret line="4" column="39" selection-start-line="4" selection-start-column="39" selection-end-line="4" selection-end-column="39" />
+                  <caret line="4" column="19" selection-start-line="4" selection-start-column="19" selection-end-line="4" selection-end-column="19" />
                 </state>
               </provider>
             </entry>
@@ -114,7 +107,7 @@
   <component name="NodePackageJsonFileManager">
     <packageJsonPaths />
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="-7" />
     <option name="width" value="974" />
     <option name="height" value="1057" />
@@ -229,12 +222,12 @@
       <updated>1531487152241</updated>
       <workItem from="1531487153494" duration="926000" />
       <workItem from="1531489020031" duration="4363000" />
-      <workItem from="1531494134301" duration="2575000" />
+      <workItem from="1531494134301" duration="3269000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="7864000" />
+    <option name="totallyTimeSpent" value="8558000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1066" extended-state="6" />
@@ -416,16 +409,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/config.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="64">
-          <caret line="4" column="39" selection-start-line="4" selection-start-column="39" selection-end-line="4" selection-end-column="39" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/twitterscraper/TwitterScraper.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="641">
+        <state relative-caret-position="305">
           <caret line="83" selection-start-line="83" selection-end-line="83" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -434,6 +420,13 @@
             <element signature="e#3828#3829#0" expanded="true" />
             <element signature="e#3890#3891#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="64">
+          <caret line="4" column="19" selection-start-line="4" selection-start-column="19" selection-end-line="4" selection-end-column="19" />
         </state>
       </provider>
     </entry>
