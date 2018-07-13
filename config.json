@@ -2,8 +2,8 @@
   "queries": [
     {
       "mentions": [],
-      "hashtags": ["maga"],
-      "quotes": ["christ is lord"],
+      "hashtags": ["whitelivesmatter", "maga"],
+      "quotes": [],
       "includeRetweets": false
     }
   ]
