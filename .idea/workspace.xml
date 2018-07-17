@@ -2,16 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="88753f7e-6fa8-45a9-9b1f-4b5c47ff8361" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_mongodb_bson_3_8_0.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_mongodb_mongodb_driver_core_3_8_0.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_mongodb_mongodb_driver_sync_3_8_0.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/twitterscraper/model/DatabaseWrapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/keithm.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/keithm.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/twitterscraper/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/twitterscraper/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/twitterscraper/model/DatabaseWrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/twitterscraper/model/DatabaseWrapper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tweets.json" beforeDir="false" afterPath="$PROJECT_DIR$/tweets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/twitterscraper.iml" beforeDir="false" afterPath="$PROJECT_DIR$/twitterscraper.iml" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -63,11 +57,20 @@
       </split-first>
       <split-second>
         <leaf>
+          <file leaf-file-name="config.json" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/config.json">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="144">
+                  <caret line="9" column="1" lean-forward="true" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
+                </state>
+              </provider>
+            </entry>
+          </file>
           <file leaf-file-name="DatabaseWrapper.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/main/java/com/twitterscraper/model/DatabaseWrapper.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="367">
-                  <caret line="45" column="28" selection-start-line="45" selection-start-column="27" selection-end-line="45" selection-end-column="28" />
+                <state relative-caret-position="223">
+                  <caret line="98" lean-forward="true" selection-start-line="98" selection-end-line="98" />
                   <folding>
                     <element signature="imports" expanded="true" />
                   </folding>
@@ -95,10 +98,10 @@
         <option value="$PROJECT_DIR$/src/main/java/com/twitterscraper/model/Config.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/twitterscraper/twitter/utils/QueryBuilder.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/twitterscraper/twitter/utils/TwitterUtils.java" />
-        <option value="$PROJECT_DIR$/config.json" />
         <option value="$PROJECT_DIR$/src/main/java/com/twitterscraper/TwitterScraper.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/src/main/java/com/twitterscraper/Main.java" />
+        <option value="$PROJECT_DIR$/config.json" />
         <option value="$PROJECT_DIR$/src/main/java/com/twitterscraper/model/DatabaseWrapper.java" />
       </list>
     </option>
@@ -235,15 +238,16 @@
       <workItem from="1531487153494" duration="926000" />
       <workItem from="1531489020031" duration="4363000" />
       <workItem from="1531494134301" duration="7290000" />
-      <workItem from="1531842468535" duration="3322000" />
+      <workItem from="1531842468535" duration="6411000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="15901000" />
+    <option name="totallyTimeSpent" value="18990000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1066" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -439,27 +443,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/config.json">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/twitterscraper/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="96">
-          <caret line="6" column="30" selection-start-line="6" selection-start-column="30" selection-end-line="6" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/twitterscraper/model/DatabaseWrapper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="367">
-          <caret line="45" column="28" selection-start-line="45" selection-start-column="27" selection-end-line="45" selection-end-column="28" />
+        <state relative-caret-position="287">
+          <caret line="24" column="22" selection-start-line="24" selection-start-column="22" selection-end-line="24" selection-end-column="22" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/twitterscraper/Main.java">
+    <entry file="file://$PROJECT_DIR$/config.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="287">
-          <caret line="24" column="22" selection-start-line="24" selection-start-column="22" selection-end-line="24" selection-end-column="22" />
+        <state relative-caret-position="144">
+          <caret line="9" column="1" lean-forward="true" selection-start-line="9" selection-start-column="1" selection-end-line="9" selection-end-column="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/twitterscraper/model/DatabaseWrapper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="223">
+          <caret line="98" lean-forward="true" selection-start-line="98" selection-end-line="98" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
