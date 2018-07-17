@@ -1,8 +1,8 @@
 {
   "queries": [
     {
-      "mentions": [],
-      "hashtags": ["crookedmedia"],
+      "mentions": ["nasa"],
+      "hashtags": [],
       "quotes": [],
       "includeRetweets": false
     }

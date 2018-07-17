@@ -20,6 +20,7 @@ public class QueryBuilder {
         queryString = new StringBuilder();
         includeRetweets = false;
         query = new Query();
+        setQueryLimit(100);
     }
 
     public QueryBuilder(String initialText) {
