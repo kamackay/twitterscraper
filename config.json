@@ -1,8 +1,29 @@
 {
   "queries": [
     {
-      "mentions": ["realDonaldTrump"],
+      "queryName": "TweetsAboutTrump",
+      "mentions": [
+        "realDonaldTrump"
+      ],
       "hashtags": [],
+      "quotes": [],
+      "includeRetweets": false
+    },
+    {
+      "queryName": "TweetsAboutElonMusk",
+      "mentions": [
+        "elonmusk"
+      ],
+      "hashtags": [],
+      "quotes": [],
+      "includeRetweets": false
+    },
+    {
+      "queryName": "#maga",
+      "mentions": [],
+      "hashtags": [
+        "maga"
+      ],
       "quotes": [],
       "includeRetweets": false
     }

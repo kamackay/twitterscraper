@@ -1,7 +1,6 @@
 package com.twitterscraper.model;
 
 import com.twitterscraper.twitter.utils.QueryBuilder;
-import twitter4j.Query;
 
 import java.util.List;
 
@@ -20,6 +19,7 @@ public class Config {
 
     private QueryBuilder convertQuery(QueryModel query) {
         return new QueryBuilder()
+                .setModel(query)
                 .addMentions(query.mentions)
                 .addQuotes(query.quotes)
                 .addHashtags(query.hashtags)

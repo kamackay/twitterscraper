@@ -19,9 +19,9 @@ public class Main {
         try {
             final DatabaseWrapper db = new DatabaseWrapper();
             new TwitterScraper()
-                    .setTweetHandler(tweet -> {
-                        TwitterScraper.printTweet(tweet);
-                        db.upsert(tweet);
+                    .setTweetHandler((tweet, query) -> {
+                        TwitterScraper.printTweet(tweet, query);
+                        db.upsert(tweet, query.getModel().queryName);
                     })
                     .run();
         } catch (Exception e) {

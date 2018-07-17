@@ -4,8 +4,9 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.UpdateOptions;
+import com.sun.istack.internal.NotNull;
 import org.bson.Document;
 import twitter4j.*;
 
@@ -16,7 +17,7 @@ import static com.mongodb.client.model.Filters.eq;
 import static java.util.stream.Collectors.toList;
 
 public class DatabaseWrapper {
-    private final MongoCollection<Document> db;
+    private final MongoDatabase db;
 
     public DatabaseWrapper() {
         MongoClient client = MongoClients.create(MongoClientSettings.builder()
@@ -25,13 +26,14 @@ public class DatabaseWrapper {
                                 new ServerAddress("localhost", 27017)
                         )))
                 .build());
-        db = client.getDatabase("tweets").getCollection("tweets");
+        db = client.getDatabase("TwitterScraper");
     }
 
-    public void upsert(final Status tweet) {
-        db.updateOne(eq("id", tweet.getId()),
-                new Document("$set", convert(tweet)),
-                new UpdateOptions().upsert(true));
+    public void upsert(final Status tweet, @NotNull final String collectionName) {
+        db.getCollection(collectionName)
+                .updateOne(eq("id", tweet.getId()),
+                        new Document("$set", convert(tweet)),
+                        new UpdateOptions().upsert(true));
     }
 
     private Document convert(final Status tweet) {

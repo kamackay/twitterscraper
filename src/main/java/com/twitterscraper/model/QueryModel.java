@@ -7,4 +7,5 @@ public class QueryModel {
     public List<String> quotes;
     public List<String> hashtags;
     public boolean includeRetweets;
+    public String queryName;
 }

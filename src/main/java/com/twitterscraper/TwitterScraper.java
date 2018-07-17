@@ -3,6 +3,7 @@ package com.twitterscraper;
 import com.google.gson.Gson;
 import com.twitterscraper.logging.Logger;
 import com.twitterscraper.model.Config;
+import com.twitterscraper.model.Query;
 import com.twitterscraper.twitter.utils.TweetPrinter;
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
@@ -11,7 +12,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 
 class TwitterScraper {
@@ -19,9 +20,9 @@ class TwitterScraper {
     private Map<String, RateLimitStatus> limitMap;
 
     private static final Logger logger = new Logger(TwitterScraper.class);
-    private List<Query> queries;
+    private List<com.twitterscraper.model.Query> queries;
     private final Twitter twitter;
-    private Consumer<Status> handleTweet;
+    private BiConsumer<Status, Query> handleTweet;
     private List<Status> tweets;
 
     private static final String RATE_LIMIT_STATUS = "/application/rate_limit_status";
@@ -45,18 +46,18 @@ class TwitterScraper {
     /**
      * Run the configured Queries and handle the results
      */
-    void run(final boolean resetList) {
+    private void run(final boolean resetList) {
         if (resetList) setQueries();
         new Thread(() -> {
             //checkLimits();
             queries.forEach(query -> {
                 try {
                     QueryResult result;
-                    result = twitter.search(query);
+                    result = twitter.search(query.getQuery());
                     logger.log("");
                     logger.log("Results for: " + query.toString());
                     logger.log("");
-                    result.getTweets().forEach(this::handleTweet);
+                    result.getTweets().forEach(tweet -> handleTweet(tweet, query));
                 } catch (Exception e) {
                     logger.e(e);
                 }
@@ -103,26 +104,27 @@ class TwitterScraper {
     }
 
     private void setQueries() {
-        Optional.ofNullable(getConfig()).ifPresent(config -> setQueryList(config.convertQueries()));
+        Optional.ofNullable(getConfig()).ifPresent(config ->
+                setQueryList(config.convertQueries()));
     }
 
-    TwitterScraper setTweetHandler(Consumer<Status> handleTweet) {
+    TwitterScraper setTweetHandler(BiConsumer<Status, Query> handleTweet) {
         this.handleTweet = handleTweet;
         return this;
     }
 
-    TwitterScraper setQueryList(final List<Query> queries) {
+    private TwitterScraper setQueryList(final List<com.twitterscraper.model.Query> queries) {
         this.queries.clear();
         this.queries.addAll(queries);
         return this;
     }
 
-    private void handleTweet(Status tweet) {
+    private void handleTweet(Status tweet, Query query) {
         tweets.add(tweet);
-        Optional.ofNullable(handleTweet).orElse(TwitterScraper::printTweet).accept(tweet);
+        Optional.ofNullable(handleTweet).orElse(TwitterScraper::printTweet).accept(tweet, query);
     }
 
-    static void printTweet(Status tweet) {
+    static void printTweet(final Status tweet, final Query query) {
         logger.log(new TweetPrinter(tweet).toString());
     }
 

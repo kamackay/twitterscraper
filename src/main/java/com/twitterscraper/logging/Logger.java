@@ -6,6 +6,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Placeholder logging class
@@ -15,6 +18,8 @@ public class Logger {
     private final Class classname;
     private static final String filename = "output.log";
     private final Gson gson;
+    private static final DateFormat DATE_FORMAT =
+            new SimpleDateFormat("yyyy/MM/DD HH:mm:ss");
 
     public Logger(Class classname) {
         this.classname = classname;
@@ -36,7 +41,8 @@ public class Logger {
      */
     public void log(String s) {
         // TODO make this an actual logger
-        String text = String.format("%s - %s",
+        String text = String.format("%s - %s: %s",
+                getCurrentTimestamp(),
                 classname.getName(),
                 s);
         System.out.println(text);
@@ -45,6 +51,10 @@ public class Logger {
         } catch (Exception e) {
             // ?
         }
+    }
+
+    private String getCurrentTimestamp() {
+        return DATE_FORMAT.format(new Date());
     }
 
     /**
