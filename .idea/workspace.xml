@@ -2,17 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="88753f7e-6fa8-45a9-9b1f-4b5c47ff8361" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/twitterscraper/model/Query.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/twitterscraper/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/twitterscraper/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/twitterscraper/TwitterScraper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/twitterscraper/TwitterScraper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/twitterscraper/logging/Logger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/twitterscraper/logging/Logger.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/twitterscraper/model/Config.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/twitterscraper/model/Config.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/twitterscraper/model/DatabaseWrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/twitterscraper/model/DatabaseWrapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/twitterscraper/model/QueryModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/twitterscraper/model/QueryModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/twitterscraper/twitter/utils/QueryBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/twitterscraper/twitter/utils/QueryBuilder.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tweets.json" beforeDir="false" afterPath="$PROJECT_DIR$/tweets.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -98,7 +88,7 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="DatabaseWrapper.java" pinned="false" current-in-tab="true">
+          <file leaf-file-name="DatabaseWrapper.java" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/src/main/java/com/twitterscraper/model/DatabaseWrapper.java">
               <provider selected="true" editor-type-id="text-editor">
                 <state relative-caret-position="333">
@@ -106,6 +96,15 @@
                   <folding>
                     <element signature="imports" expanded="true" />
                   </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/.gitignore">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="48">
+                  <caret line="3" column="11" selection-start-line="3" selection-start-column="11" selection-end-line="3" selection-end-column="11" />
                 </state>
               </provider>
             </entry>
@@ -151,6 +150,7 @@
         <option value="$PROJECT_DIR$/src/main/java/com/twitterscraper/logging/Logger.java" />
         <option value="$PROJECT_DIR$/config.json" />
         <option value="$PROJECT_DIR$/src/main/java/com/twitterscraper/model/DatabaseWrapper.java" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -295,15 +295,16 @@
       <workItem from="1531487153494" duration="926000" />
       <workItem from="1531489020031" duration="4363000" />
       <workItem from="1531494134301" duration="7290000" />
-      <workItem from="1531842468535" duration="10204000" />
+      <workItem from="1531842468535" duration="10819000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="22783000" />
+    <option name="totallyTimeSpent" value="23398000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1066" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -319,7 +320,7 @@
       <window_info anchor="bottom" id="Terminal" order="7" weight="0.32928178" />
       <window_info id="Capture Tool" order="2" />
       <window_info id="Designer" order="2" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25799572" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25799572" />
       <window_info anchor="right" id="Database" order="3" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32928178" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -327,7 +328,7 @@
       <window_info id="UI Designer" order="2" />
       <window_info anchor="right" id="Theme Preview" order="3" />
       <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" sideWeight="0.49946696" visible="true" weight="0.4" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49946696" visible="true" weight="0.4" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -568,6 +569,13 @@
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="48">
+          <caret line="3" column="11" selection-start-line="3" selection-start-column="11" selection-end-line="3" selection-end-column="11" />
         </state>
       </provider>
     </entry>
