@@ -3,7 +3,9 @@
     <words>
       <w>hashtag</w>
       <w>hashtags</w>
+      <w>retweet</w>
       <w>retweets</w>
+      <w>upsert</w>
     </words>
   </dictionary>
 </component>
