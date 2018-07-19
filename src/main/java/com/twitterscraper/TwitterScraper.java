@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import com.twitterscraper.db.DatabaseWrapper;
 import com.twitterscraper.logging.Logger;
 import com.twitterscraper.model.Config;
-import com.twitterscraper.model.Query;
-import com.twitterscraper.twitter.utils.TweetPrinter;
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
 
@@ -72,7 +70,10 @@ class TwitterScraper {
                     logger.log(String.format("Query %s returned %d results",
                             query.getModel().getQueryName(),
                             tweets.size()));
-                    tweets.forEach(tweet -> handleTweet(tweet, query));
+                    final int newTweets = (int) tweets.stream()
+                            .filter(tweet -> db.upsert(tweet, query.getModel().queryName))
+                            .count();
+                    logger.log(String.format("\t%d of the results were new", newTweets));
                 } catch (Exception e) {
                     logger.e("Error handling query " + query.getModel().getQueryName(), e);
                 }
@@ -114,15 +115,6 @@ class TwitterScraper {
         return this;
     }
 
-    private void handleTweet(Status tweet, Query query) {
-        //printTweet(tweet);
-        db.upsert(tweet, query.getModel().queryName);
-    }
-
-    private static void printTweet(final Status tweet) {
-        logger.log(new TweetPrinter(tweet).toString());
-    }
-
     private void resetLimitMap() {
         if (limitMap == null) limitMap = new HashMap<>();
         try {
@@ -131,24 +123,6 @@ class TwitterScraper {
         } catch (TwitterException e) {
             limitMap.clear();
         }
-    }
-
-    private void checkLimits() {
-        try {
-            logger.log("Checking tweets as " + twitter.getScreenName());
-            twitter.getRateLimitStatus().forEach((key, value) -> {
-                if (value.getRemaining() != value.getLimit()) {
-                    logger.log(String.format("%s: %d/%d - %d seconds",
-                            key,
-                            value.getRemaining(),
-                            value.getLimit(),
-                            value.getSecondsUntilReset()));
-                }
-            });
-        } catch (TwitterException e) {
-            logger.e(e);
-        }
-        logger.log("");
     }
 
 

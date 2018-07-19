@@ -92,6 +92,7 @@ public class Transforms {
 
     public static String millisToReadableTime(long millis) {
         final StringBuilder builder = new StringBuilder();
+        millis = readableTimeHelper(millis, HOUR * 24, "days", builder);
         millis = readableTimeHelper(millis, HOUR, "hours", builder);
         millis = readableTimeHelper(millis, MINUTE, "minutes", builder);
         millis = readableTimeHelper(millis, SECOND, "seconds", builder);

@@ -32,11 +32,18 @@ public class DatabaseWrapper {
         db = client.getDatabase("TwitterScraper");
     }
 
-    public void upsert(final Status tweet, @NotNull final String collectionName) {
-        db.getCollection(collectionName)
+    /**
+     * Upsert (Update or Insert) this tweet into the mongo collection provided
+     *
+     * @param tweet - The tweet to add to the database
+     * @param collectionName - The collection to add the tweet to
+     * @return boolean of whether the tweet was new
+     */
+    public boolean upsert(final Status tweet, @NotNull final String collectionName) {
+        return db.getCollection(collectionName)
                 .updateOne(eq("id", tweet.getId()),
                         new Document("$set", convert(tweet)),
-                        new UpdateOptions().upsert(true));
+                        new UpdateOptions().upsert(true)).getMatchedCount() == 0;
     }
 
     public long getMostRecent(@NotNull final String collectionName) {
