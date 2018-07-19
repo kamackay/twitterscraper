@@ -20,7 +20,7 @@ import static com.twitterscraper.db.Transforms.convert;
 public class DatabaseWrapper {
     private final MongoDatabase db;
 
-    private static final Logger logger = new Logger(DatabaseWrapper.class);
+    private final Logger logger = new Logger(getClass());
 
     public DatabaseWrapper() {
         MongoClient client = MongoClients.create(MongoClientSettings.builder()

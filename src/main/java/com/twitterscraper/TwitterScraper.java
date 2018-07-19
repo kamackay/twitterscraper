@@ -18,7 +18,7 @@ class TwitterScraper {
 
     private Map<String, RateLimitStatus> limitMap;
 
-    private static final Logger logger = new Logger(TwitterScraper.class);
+    private final Logger logger = new Logger(getClass());
     private List<com.twitterscraper.model.Query> queries;
     private final Twitter twitter;
     private final DatabaseWrapper db;
@@ -73,7 +73,10 @@ class TwitterScraper {
                     final int newTweets = (int) tweets.stream()
                             .filter(tweet -> db.upsert(tweet, query.getModel().queryName))
                             .count();
-                    logger.log(String.format("\t%d of the results were new", newTweets));
+                    logger.log(String.format("\t%d %s new",
+                            newTweets,
+                            // for grammar's sake
+                            newTweets == 1 ? "result was": "of the results were"));
                 } catch (Exception e) {
                     logger.e("Error handling query " + query.getModel().getQueryName(), e);
                 }
@@ -131,7 +134,7 @@ class TwitterScraper {
      *
      * @return The Config Object, converted from json
      */
-    private static Config getConfig() {
+    private Config getConfig() {
         try {
             return new Gson().fromJson(new FileReader("config.json"), Config.class);
         } catch (FileNotFoundException e) {
