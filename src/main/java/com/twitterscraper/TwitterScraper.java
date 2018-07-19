@@ -65,7 +65,8 @@ class TwitterScraper {
                 try {
                     long mostRecent = db.getMostRecent(query.getModel().getQueryName());
                     logger.log(String.format("Most Recent Tweet was ID %d", mostRecent));
-                    query.getQuery().sinceId(mostRecent);
+                    //query.getQuery().sinceId(mostRecent);
+                    // Uncomment this line to make it so that the query only gets new tweets
                     final QueryResult result = twitter.search(query.getQuery());
                     final List<Status> tweets = result.getTweets();
                     logger.log(String.format("Query %s returned %d results",
