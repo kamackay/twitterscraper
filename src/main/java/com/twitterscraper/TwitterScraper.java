@@ -44,9 +44,13 @@ class TwitterScraper {
     /**
      * Run the configured Queries and handle the results
      */
-    void run() {
-        setQueries();
-        new Thread(() -> {
+    void start() {
+        new Thread(this::run).start();
+    }
+
+    private void run() {
+        while (true) {
+            setQueries();
             resetLimitMap();
             try {
                 boolean ready = waitOnLimit(RATE_LIMIT_STATUS, 2);
@@ -73,16 +77,15 @@ class TwitterScraper {
                     final int newTweets = (int) tweets.stream()
                             .filter(tweet -> db.upsert(tweet, query.getModel().queryName))
                             .count();
-                    logger.log(String.format("\t%d %s new",
+                    if (newTweets > 0) logger.log(String.format("\t%d %s new",
                             newTweets,
                             // for grammar's sake
-                            newTweets == 1 ? "result was": "of the results were"));
+                            newTweets == 1 ? "result was" : "of the results were"));
                 } catch (Exception e) {
                     logger.e("Error handling query " + query.getModel().getQueryName(), e);
                 }
             });
-            this.run();
-        }).run();
+        }
     }
 
     private boolean waitOnLimit(final String limitName, final int minLimit) throws InterruptedException {

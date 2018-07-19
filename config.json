@@ -13,16 +13,12 @@
 			"hashtags": ["maga"]
 		},
 		{
-			"queryName": "#maga",
-			"quotes": ["America Great Again"]
+			"queryName": "#TrumpKnew",
+			"hashtags": ["TrumpKnew"]
 		},
 		{
 			"queryName": "ObamaMentions",
 			"mentions": ["BarackObama"]
-		},
-		{
-			"queryName": "JustinBieberMentions",
-			"mentions": ["justinbieber"]
 		}
 	]
 }

@@ -7,7 +7,6 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.UpdateOptions;
 import com.sun.istack.internal.NotNull;
-import com.twitterscraper.logging.Logger;
 import org.bson.Document;
 import twitter4j.Status;
 
@@ -19,8 +18,6 @@ import static com.twitterscraper.db.Transforms.convert;
 
 public class DatabaseWrapper {
     private final MongoDatabase db;
-
-    private final Logger logger = new Logger(getClass());
 
     public DatabaseWrapper() {
         MongoClient client = MongoClients.create(MongoClientSettings.builder()
