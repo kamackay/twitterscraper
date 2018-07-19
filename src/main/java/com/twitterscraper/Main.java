@@ -1,7 +1,7 @@
 package com.twitterscraper;
 
+import com.twitterscraper.db.DatabaseWrapper;
 import com.twitterscraper.logging.Logger;
-import com.twitterscraper.model.DatabaseWrapper;
 
 /**
  * Entry point class
@@ -19,10 +19,6 @@ public class Main {
         try {
             final DatabaseWrapper db = new DatabaseWrapper();
             new TwitterScraper()
-                    .setTweetHandler((tweet, query) -> {
-                        TwitterScraper.printTweet(tweet, query);
-                        db.upsert(tweet, query.getModel().queryName);
-                    })
                     .run();
         } catch (Exception e) {
             logger.e(e);

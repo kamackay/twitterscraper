@@ -1,31 +1,28 @@
 {
-  "queries": [
-    {
-      "queryName": "TweetsAboutTrump",
-      "mentions": [
-        "realDonaldTrump"
-      ],
-      "hashtags": [],
-      "quotes": [],
-      "includeRetweets": false
-    },
-    {
-      "queryName": "TweetsAboutElonMusk",
-      "mentions": [
-        "elonmusk"
-      ],
-      "hashtags": [],
-      "quotes": [],
-      "includeRetweets": false
-    },
-    {
-      "queryName": "#maga",
-      "mentions": [],
-      "hashtags": [
-        "maga"
-      ],
-      "quotes": [],
-      "includeRetweets": false
-    }
-  ]
+	"queries": [
+		{
+			"queryName": "TrumpMentions",
+			"mentions": ["realDonaldTrump"]
+		},
+		{
+			"queryName": "ElonMuskMentions",
+			"mentions": ["elonmusk"]
+		},
+		{
+			"queryName": "#maga",
+			"hashtags": ["maga"]
+		},
+		{
+			"queryName": "#maga",
+			"quotes": ["America Great Again"]
+		},
+		{
+			"queryName": "ObamaMentions",
+			"mentions": ["BarackObama"]
+		},
+		{
+			"queryName": "JustinBieberMentions",
+			"mentions": ["justinbieber"]
+		}
+	]
 }

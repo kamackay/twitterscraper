@@ -31,8 +31,8 @@ public class TweetPrinter {
         return text.replace("\n", "\\n");
     }
 
-    private String getTweetUrl() {
-        return "https://twitter.com/" + tweet.getUser().getScreenName() + "/status/" + tweet.getId();
+    public String getTweetUrl() {
+        return "https://twitter.com/statuses" + tweet.getId();
     }
 
     private Place getPlace() {

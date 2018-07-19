@@ -19,9 +19,9 @@ public class Logger {
     private static final String filename = "output.log";
     private final Gson gson;
     private static final DateFormat DATE_FORMAT =
-            new SimpleDateFormat("yyyy/MM/DD HH:mm:ss");
+            new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
-    public Logger(Class classname) {
+    public Logger(final Class classname) {
         this.classname = classname;
         this.gson = new Gson();
         File f = new File(filename);
@@ -39,7 +39,7 @@ public class Logger {
      *
      * @param s - String to log
      */
-    public void log(String s) {
+    public void log(final String s) {
         // TODO make this an actual logger
         String text = String.format("%s - %s: %s",
                 getCurrentTimestamp(),
@@ -57,12 +57,19 @@ public class Logger {
         return DATE_FORMAT.format(new Date());
     }
 
+    public void e(final String message, final Throwable e) {
+        log(String.format("%s - %s", message, e.getMessage()));
+        for (StackTraceElement element : e.getStackTrace()) {
+            log(element.toString());
+        }
+    }
+
     /**
      * Log the given exception
      *
      * @param e - Exception to log
      */
-    public void e(Throwable e) {
+    public void e(final Throwable e) {
         log(e.getMessage());
         for (StackTraceElement element : e.getStackTrace()) {
             log(element.toString());

@@ -8,4 +8,8 @@ public class QueryModel {
     public List<String> hashtags;
     public boolean includeRetweets;
     public String queryName;
+
+    public String getQueryName() {
+        return queryName;
+    }
 }

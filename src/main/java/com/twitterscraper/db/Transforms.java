@@ -1,59 +1,36 @@
-package com.twitterscraper.model;
+package com.twitterscraper.db;
 
-import com.mongodb.MongoClientSettings;
-import com.mongodb.ServerAddress;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.UpdateOptions;
-import com.sun.istack.internal.NotNull;
+import com.twitterscraper.twitter.utils.TweetPrinter;
 import org.bson.Document;
 import twitter4j.*;
 
 import java.util.Arrays;
 import java.util.Optional;
 
-import static com.mongodb.client.model.Filters.eq;
 import static java.util.stream.Collectors.toList;
 
-public class DatabaseWrapper {
-    private final MongoDatabase db;
-
-    public DatabaseWrapper() {
-        MongoClient client = MongoClients.create(MongoClientSettings.builder()
-                .applyToClusterSettings(builder ->
-                        builder.hosts(Arrays.asList(
-                                new ServerAddress("localhost", 27017)
-                        )))
-                .build());
-        db = client.getDatabase("TwitterScraper");
-    }
-
-    public void upsert(final Status tweet, @NotNull final String collectionName) {
-        db.getCollection(collectionName)
-                .updateOne(eq("id", tweet.getId()),
-                        new Document("$set", convert(tweet)),
-                        new UpdateOptions().upsert(true));
-    }
-
-    private Document convert(final Status tweet) {
+public class Transforms {
+    static Document convert(final Status tweet) {
         final Document document = new Document("id", tweet.getId())
                 .append("text", tweet.getText())
                 .append("retweetCount", tweet.getRetweetCount())
                 .append("createdAt", tweet.getCreatedAt())
                 .append("favoriteCount", tweet.getFavoriteCount())
+                //.append("contributors", tweet.getContributors())
+                .append("lang", tweet.getLang())
                 .append("userMentionedEntities",
                         Arrays.stream(tweet.getUserMentionEntities())
-                                .map(this::convert).collect(toList()))
+                                .map(Transforms::convert).collect(toList()))
                 .append("mediaEntities",
                         Arrays.stream(tweet.getMediaEntities())
-                                .map(this::convert).collect(toList()))
+                                .map(Transforms::convert).collect(toList()))
                 .append("urlEntities",
                         Arrays.stream(tweet.getURLEntities())
-                                .map(this::convert).collect(toList()))
+                                .map(Transforms::convert).collect(toList()))
                 .append("hashtagEntities",
                         Arrays.stream(tweet.getHashtagEntities())
-                                .map(this::convert).collect(toList()));
+                                .map(Transforms::convert).collect(toList()))
+                .append("tweetURL", new TweetPrinter(tweet).getTweetUrl());
 
         Optional.ofNullable(tweet.getUser()).ifPresent(user -> {
             document.append("user", convert(user));
@@ -62,7 +39,7 @@ public class DatabaseWrapper {
         return document;
     }
 
-    private Document convert(final URLEntity e) {
+    private static Document convert(final URLEntity e) {
         return new Document("expandedURL", e.getExpandedURL())
                 .append("text", e.getText())
                 .append("displayURL", e.getDisplayURL())
@@ -71,13 +48,13 @@ public class DatabaseWrapper {
                 .append("url", e.getURL());
     }
 
-    private Document convert(final HashtagEntity e) {
+    private static Document convert(final HashtagEntity e) {
         return new Document("text", e.getText())
                 .append("start", e.getStart())
                 .append("end", e.getEnd());
     }
 
-    private Document convert(final UserMentionEntity e) {
+    private static Document convert(final UserMentionEntity e) {
         return new Document("id", e.getId())
                 .append("screenName", e.getScreenName())
                 .append("text", e.getText())
@@ -87,7 +64,7 @@ public class DatabaseWrapper {
                 .append("name", e.getName());
     }
 
-    private Document convert(final MediaEntity e) {
+    private static Document convert(final MediaEntity e) {
         return new Document("id", e.getId())
                 .append("mediaURL", e.getMediaURL())
                 .append("mediaURLHttps", e.getMediaURLHttps())
@@ -99,7 +76,7 @@ public class DatabaseWrapper {
                 .append("url", e.getURL());
     }
 
-    private Document convert(final User u) {
+    private static Document convert(final User u) {
         return new Document("id", u.getId())
                 .append("screenName", u.getScreenName())
                 .append("name", u.getName())
@@ -107,5 +84,25 @@ public class DatabaseWrapper {
                 .append("followersCount", u.getFollowersCount())
                 .append("friendsCount", u.getFriendsCount())
                 .append("isVerified", u.isVerified());
+    }
+
+    private final static long HOUR = 3600000;
+    private final static long MINUTE = 60000;
+    private final static long SECOND = 1000;
+
+    public static String millisToReadableTime(long millis) {
+        final StringBuilder builder = new StringBuilder();
+        millis = readableTimeHelper(millis, HOUR, "hours", builder);
+        millis = readableTimeHelper(millis, MINUTE, "minutes", builder);
+        millis = readableTimeHelper(millis, SECOND, "seconds", builder);
+        readableTimeHelper(millis, 1, "ms", builder);
+        return builder.toString().trim();
+    }
+
+    private static long readableTimeHelper(long time, long unit, String unitName, StringBuilder builder) {
+        if (time >= unit) {
+            builder.append(String.format("%d %s ", time / unit, unitName));
+            return time % unit;
+        } else return time;
     }
 }
