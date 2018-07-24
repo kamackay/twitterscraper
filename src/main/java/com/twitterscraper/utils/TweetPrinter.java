@@ -1,4 +1,4 @@
-package com.twitterscraper.twitter.utils;
+package com.twitterscraper.utils;
 
 import com.google.gson.Gson;
 import twitter4j.Place;
