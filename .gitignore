@@ -3,3 +3,4 @@ target/*
 output.log
 tweets.json
 .idea/*
+twitterscraper.iml

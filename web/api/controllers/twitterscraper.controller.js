@@ -7,11 +7,13 @@ _this = this;
 exports.getTweets = async function(req, res, next) {
 	// Check the existence of the query parameters, If the exists doesn't exists assign a default value
 
-	var page = req.query.page ? req.query.page : 1;
-	var limit = req.query.limit ? req.query.limit : 100;
+	const collection = req.params.collection;
+
+	var page = req.query.page ? parseInt(req.query.page) : 1;
+	var limit = req.query.limit ? parseInt(req.query.limit) : 100;
 
 	try {
-		var tweets = await twitterService.getTweets({}, page, limit);
+		var tweets = await twitterService.getTweets(collection, {}, page, limit);
 
 		return res
 			.status(200)
