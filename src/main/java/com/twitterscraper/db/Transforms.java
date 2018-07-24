@@ -10,14 +10,21 @@ import java.util.Optional;
 import static java.util.stream.Collectors.toList;
 
 public class Transforms {
+
+    static final String ID = "id";
+
     static Document convert(final Status tweet) {
-        final Document document = new Document("id", tweet.getId())
+        final Document document = new Document(ID, tweet.getId())
                 .append("text", tweet.getText())
                 .append("retweetCount", tweet.getRetweetCount())
                 .append("createdAt", tweet.getCreatedAt())
                 .append("favoriteCount", tweet.getFavoriteCount())
-                //.append("contributors", tweet.getContributors())
                 .append("lang", tweet.getLang())
+                .append("inReplyToUserId", tweet.getInReplyToUserId())
+                .append("inReplyToScreenName", tweet.getInReplyToScreenName())
+                .append("scopes", tweet.getScopes())
+                .append("accessLevel", tweet.getAccessLevel())
+                .append("source", tweet.getSource())
                 .append("userMentionedEntities",
                         Arrays.stream(tweet.getUserMentionEntities())
                                 .map(Transforms::convert).collect(toList()))
@@ -30,6 +37,7 @@ public class Transforms {
                 .append("hashtagEntities",
                         Arrays.stream(tweet.getHashtagEntities())
                                 .map(Transforms::convert).collect(toList()))
+                .append("place", convert(tweet.getPlace()))
                 .append("tweetURL", new TweetPrinter(tweet).getTweetUrl());
 
         Optional.ofNullable(tweet.getUser()).ifPresent(user -> {
@@ -39,7 +47,19 @@ public class Transforms {
         return document;
     }
 
+    private static Document convert(Place place) {
+        if (place == null) return null;
+        return new Document("id", place.getId())
+                .append("name", place.getName())
+                .append("url", place.getURL())
+                .append("placeType", place.getPlaceType())
+                .append("country", place.getCountry())
+                .append("fullName", place.getFullName())
+                .append("streetAddress", place.getStreetAddress());
+    }
+
     private static Document convert(final URLEntity e) {
+        if (e == null) return null;
         return new Document("expandedURL", e.getExpandedURL())
                 .append("text", e.getText())
                 .append("displayURL", e.getDisplayURL())
@@ -49,12 +69,14 @@ public class Transforms {
     }
 
     private static Document convert(final HashtagEntity e) {
+        if (e == null) return null;
         return new Document("text", e.getText())
                 .append("start", e.getStart())
                 .append("end", e.getEnd());
     }
 
     private static Document convert(final UserMentionEntity e) {
+        if (e == null) return null;
         return new Document("id", e.getId())
                 .append("screenName", e.getScreenName())
                 .append("text", e.getText())
@@ -65,6 +87,7 @@ public class Transforms {
     }
 
     private static Document convert(final MediaEntity e) {
+        if (e == null) return null;
         return new Document("id", e.getId())
                 .append("mediaURL", e.getMediaURL())
                 .append("mediaURLHttps", e.getMediaURLHttps())
@@ -77,6 +100,7 @@ public class Transforms {
     }
 
     private static Document convert(final User u) {
+        if (u == null) return null;
         return new Document("id", u.getId())
                 .append("screenName", u.getScreenName())
                 .append("name", u.getName())
@@ -92,6 +116,7 @@ public class Transforms {
 
     public static String millisToReadableTime(long millis) {
         final StringBuilder builder = new StringBuilder();
+        millis = readableTimeHelper(millis, HOUR * 24, "days", builder);
         millis = readableTimeHelper(millis, HOUR, "hours", builder);
         millis = readableTimeHelper(millis, MINUTE, "minutes", builder);
         millis = readableTimeHelper(millis, SECOND, "seconds", builder);

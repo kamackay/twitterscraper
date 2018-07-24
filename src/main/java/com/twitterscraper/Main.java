@@ -19,7 +19,7 @@ public class Main {
         try {
             final DatabaseWrapper db = new DatabaseWrapper();
             new TwitterScraper()
-                    .run();
+                    .start();
         } catch (Exception e) {
             logger.e(e);
         }

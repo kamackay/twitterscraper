@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import com.twitterscraper.db.DatabaseWrapper;
 import com.twitterscraper.logging.Logger;
 import com.twitterscraper.model.Config;
-import com.twitterscraper.model.Query;
-import com.twitterscraper.twitter.utils.TweetPrinter;
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
 
@@ -20,7 +18,7 @@ class TwitterScraper {
 
     private Map<String, RateLimitStatus> limitMap;
 
-    private static final Logger logger = new Logger(TwitterScraper.class);
+    private final Logger logger = new Logger(getClass());
     private List<com.twitterscraper.model.Query> queries;
     private final Twitter twitter;
     private final DatabaseWrapper db;
@@ -46,15 +44,20 @@ class TwitterScraper {
     /**
      * Run the configured Queries and handle the results
      */
-    void run() {
-        setQueries();
-        new Thread(() -> {
+    void start() {
+        new Thread(this::run)
+                .start();
+    }
+
+    private void run() {
+        while (true) {
+            setQueries();
             resetLimitMap();
             try {
                 boolean ready = waitOnLimit(RATE_LIMIT_STATUS, 2);
                 ready &= waitOnLimit(SEARCH_TWEETS, queries.size() + 1);
                 if (!ready) {
-                    logger.log("Cannot get tweets because of Rate Limits");
+                    logger.log("Cannot get tweets because of Rate Limits or internet connection");
                     return;
                 }
             } catch (InterruptedException e) {
@@ -62,23 +65,27 @@ class TwitterScraper {
                 return;
             }
             queries.forEach(query -> {
+                final String queryName = query.getModel().getQueryName();
                 try {
-                    long mostRecent = db.getMostRecent(query.getModel().getQueryName());
-                    logger.log(String.format("Most Recent Tweet was ID %d", mostRecent));
-                    //query.getQuery().sinceId(mostRecent);
+                    db.verifyIndex(queryName);
+                    if (!query.getModel().getUpdateExisting()) query.getQuery().sinceId(db.getMostRecent(queryName));
                     // Uncomment this line to make it so that the query only gets new tweets
                     final QueryResult result = twitter.search(query.getQuery());
                     final List<Status> tweets = result.getTweets();
-                    logger.log(String.format("Query %s returned %d results",
-                            query.getModel().getQueryName(),
-                            tweets.size()));
-                    tweets.forEach(tweet -> handleTweet(tweet, query));
+                    final long newTweets = tweets.parallelStream()
+                            .filter(tweet -> db.upsert(tweet, queryName))
+                            .count();
+                    if (newTweets > 0)
+                        logger.log(String.format("Query %s returned %d results, %d of which were new",
+                                queryName,
+                                tweets.size(),
+                                newTweets));
+                    else logger.log("No new results from " + queryName);
                 } catch (Exception e) {
-                    logger.e("Error handling query " + query.getModel().getQueryName(), e);
+                    logger.e("Error handling query " + queryName, e);
                 }
             });
-            this.run();
-        }).run();
+        }
     }
 
     private boolean waitOnLimit(final String limitName, final int minLimit) throws InterruptedException {
@@ -87,19 +94,18 @@ class TwitterScraper {
             Thread.sleep(1000);
             return false;
         }
-        logger.log(String.format("Limit for %s is %d", limitName, limit.getRemaining()));
         if (limit.getRemaining() <= minLimit) {
             final long sleep = limit.getSecondsUntilReset() + 1;
             // Extra second to account for race conditions
             logger.log(String.format("Sleeping for %s to refresh \"%s\" limit",
                     millisToReadableTime(sleep * 1000),
                     limitName));
-            Thread.sleep(sleep * 1000);
-        } else {
-            logger.log(String.format("%d requests remaining for %s",
-                    limit.getRemaining(),
-                    limitName));
-        }
+            if (sleep >= 0) Thread.sleep(sleep * 1000);
+        } //else {
+            //logger.log(String.format("%d requests remaining for %s",
+            //        limit.getRemaining(),
+            //        limitName));
+        //}
         return true;
     }
 
@@ -114,15 +120,6 @@ class TwitterScraper {
         return this;
     }
 
-    private void handleTweet(Status tweet, Query query) {
-        //printTweet(tweet);
-        db.upsert(tweet, query.getModel().queryName);
-    }
-
-    private static void printTweet(final Status tweet) {
-        logger.log(new TweetPrinter(tweet).toString());
-    }
-
     private void resetLimitMap() {
         if (limitMap == null) limitMap = new HashMap<>();
         try {
@@ -133,31 +130,13 @@ class TwitterScraper {
         }
     }
 
-    private void checkLimits() {
-        try {
-            logger.log("Checking tweets as " + twitter.getScreenName());
-            twitter.getRateLimitStatus().forEach((key, value) -> {
-                if (value.getRemaining() != value.getLimit()) {
-                    logger.log(String.format("%s: %d/%d - %d seconds",
-                            key,
-                            value.getRemaining(),
-                            value.getLimit(),
-                            value.getSecondsUntilReset()));
-                }
-            });
-        } catch (TwitterException e) {
-            logger.e(e);
-        }
-        logger.log("");
-    }
-
 
     /**
      * Get the config from the config.json file
      *
      * @return The Config Object, converted from json
      */
-    private static Config getConfig() {
+    private Config getConfig() {
         try {
             return new Gson().fromJson(new FileReader("config.json"), Config.class);
         } catch (FileNotFoundException e) {

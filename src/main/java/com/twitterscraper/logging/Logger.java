@@ -59,8 +59,12 @@ public class Logger {
 
     public void e(final String message, final Throwable e) {
         log(String.format("%s - %s", message, e.getMessage()));
+        logStackTrace(e);
+    }
+
+    private void logStackTrace(final Throwable e) {
         for (StackTraceElement element : e.getStackTrace()) {
-            log(element.toString());
+            log("\t" + element.toString());
         }
     }
 
@@ -71,9 +75,7 @@ public class Logger {
      */
     public void e(final Throwable e) {
         log(e.getMessage());
-        for (StackTraceElement element : e.getStackTrace()) {
-            log(element.toString());
-        }
+        logStackTrace(e);
     }
 
     /**
