@@ -8,8 +8,13 @@ public class QueryModel {
     public List<String> hashtags;
     public boolean includeRetweets;
     public String queryName;
+    public boolean updateExisting = false;
 
     public String getQueryName() {
         return queryName;
+    }
+
+    public boolean getUpdateExisting() {
+        return updateExisting;
     }
 }

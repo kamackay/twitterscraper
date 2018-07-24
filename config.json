@@ -13,10 +13,6 @@
 			"hashtags": ["maga"]
 		},
 		{
-			"queryName": "#TrumpKnew",
-			"hashtags": ["TrumpKnew"]
-		},
-		{
 			"queryName": "ObamaMentions",
 			"mentions": ["BarackObama"]
 		}

@@ -45,7 +45,8 @@ class TwitterScraper {
      * Run the configured Queries and handle the results
      */
     void start() {
-        new Thread(this::run).start();
+        new Thread(this::run)
+                .start();
     }
 
     private void run() {
@@ -56,7 +57,7 @@ class TwitterScraper {
                 boolean ready = waitOnLimit(RATE_LIMIT_STATUS, 2);
                 ready &= waitOnLimit(SEARCH_TWEETS, queries.size() + 1);
                 if (!ready) {
-                    logger.log("Cannot get tweets because of Rate Limits");
+                    logger.log("Cannot get tweets because of Rate Limits or internet connection");
                     return;
                 }
             } catch (InterruptedException e) {
@@ -64,25 +65,24 @@ class TwitterScraper {
                 return;
             }
             queries.forEach(query -> {
+                final String queryName = query.getModel().getQueryName();
                 try {
-                    long mostRecent = db.getMostRecent(query.getModel().getQueryName());
-                    logger.log(String.format("Most Recent Tweet was ID %d", mostRecent));
-                    //query.getQuery().sinceId(mostRecent);
+                    db.verifyIndex(queryName);
+                    if (!query.getModel().getUpdateExisting()) query.getQuery().sinceId(db.getMostRecent(queryName));
                     // Uncomment this line to make it so that the query only gets new tweets
                     final QueryResult result = twitter.search(query.getQuery());
                     final List<Status> tweets = result.getTweets();
-                    logger.log(String.format("Query %s returned %d results",
-                            query.getModel().getQueryName(),
-                            tweets.size()));
-                    final int newTweets = (int) tweets.stream()
-                            .filter(tweet -> db.upsert(tweet, query.getModel().queryName))
+                    final long newTweets = tweets.parallelStream()
+                            .filter(tweet -> db.upsert(tweet, queryName))
                             .count();
-                    if (newTweets > 0) logger.log(String.format("\t%d %s new",
-                            newTweets,
-                            // for grammar's sake
-                            newTweets == 1 ? "result was" : "of the results were"));
+                    if (newTweets > 0)
+                        logger.log(String.format("Query %s returned %d results, %d of which were new",
+                                queryName,
+                                tweets.size(),
+                                newTweets));
+                    else logger.log("No new results from " + queryName);
                 } catch (Exception e) {
-                    logger.e("Error handling query " + query.getModel().getQueryName(), e);
+                    logger.e("Error handling query " + queryName, e);
                 }
             });
         }
@@ -94,19 +94,18 @@ class TwitterScraper {
             Thread.sleep(1000);
             return false;
         }
-        logger.log(String.format("Limit for %s is %d", limitName, limit.getRemaining()));
         if (limit.getRemaining() <= minLimit) {
             final long sleep = limit.getSecondsUntilReset() + 1;
             // Extra second to account for race conditions
             logger.log(String.format("Sleeping for %s to refresh \"%s\" limit",
                     millisToReadableTime(sleep * 1000),
                     limitName));
-            Thread.sleep(sleep * 1000);
-        } else {
-            logger.log(String.format("%d requests remaining for %s",
-                    limit.getRemaining(),
-                    limitName));
-        }
+            if (sleep >= 0) Thread.sleep(sleep * 1000);
+        } //else {
+            //logger.log(String.format("%d requests remaining for %s",
+            //        limit.getRemaining(),
+            //        limitName));
+        //}
         return true;
     }
 
