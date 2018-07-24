@@ -1,2 +1,5 @@
 twitter4j.properties
 target/*
+output.log
+tweets.json
+.idea/*

@@ -1,5 +1,6 @@
 package com.twitterscraper;
 
+import com.twitterscraper.db.DatabaseWrapper;
 import com.twitterscraper.logging.Logger;
 
 /**
@@ -16,8 +17,8 @@ public class Main {
      */
     public static void main(String[] args) {
         try {
+            final DatabaseWrapper db = new DatabaseWrapper();
             new TwitterScraper()
-                    .setTweetHandler(TwitterScraper::printTweet)
                     .run();
         } catch (Exception e) {
             logger.e(e);

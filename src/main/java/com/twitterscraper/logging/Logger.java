@@ -6,6 +6,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Placeholder logging class
@@ -15,8 +18,10 @@ public class Logger {
     private final Class classname;
     private static final String filename = "output.log";
     private final Gson gson;
+    private static final DateFormat DATE_FORMAT =
+            new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
-    public Logger(Class classname) {
+    public Logger(final Class classname) {
         this.classname = classname;
         this.gson = new Gson();
         File f = new File(filename);
@@ -34,9 +39,10 @@ public class Logger {
      *
      * @param s - String to log
      */
-    public void log(String s) {
+    public void log(final String s) {
         // TODO make this an actual logger
-        String text = String.format("%s - %s",
+        String text = String.format("%s - %s: %s",
+                getCurrentTimestamp(),
                 classname.getName(),
                 s);
         System.out.println(text);
@@ -47,12 +53,23 @@ public class Logger {
         }
     }
 
+    private String getCurrentTimestamp() {
+        return DATE_FORMAT.format(new Date());
+    }
+
+    public void e(final String message, final Throwable e) {
+        log(String.format("%s - %s", message, e.getMessage()));
+        for (StackTraceElement element : e.getStackTrace()) {
+            log(element.toString());
+        }
+    }
+
     /**
      * Log the given exception
      *
      * @param e - Exception to log
      */
-    public void e(Throwable e) {
+    public void e(final Throwable e) {
         log(e.getMessage());
         for (StackTraceElement element : e.getStackTrace()) {
             log(element.toString());

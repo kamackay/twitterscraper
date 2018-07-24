@@ -1,17 +1,19 @@
 package com.twitterscraper;
 
 import com.google.gson.Gson;
+import com.twitterscraper.db.DatabaseWrapper;
 import com.twitterscraper.logging.Logger;
 import com.twitterscraper.model.Config;
+import com.twitterscraper.model.Query;
 import com.twitterscraper.twitter.utils.TweetPrinter;
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.*;
-import java.util.function.Consumer;
+
+import static com.twitterscraper.db.Transforms.millisToReadableTime;
 
 
 class TwitterScraper {
@@ -19,18 +21,17 @@ class TwitterScraper {
     private Map<String, RateLimitStatus> limitMap;
 
     private static final Logger logger = new Logger(TwitterScraper.class);
-    private List<Query> queries;
+    private List<com.twitterscraper.model.Query> queries;
     private final Twitter twitter;
-    private Consumer<Status> handleTweet;
-    private List<Status> tweets;
+    private final DatabaseWrapper db;
 
     private static final String RATE_LIMIT_STATUS = "/application/rate_limit_status";
     private static final String SEARCH_TWEETS = "/search/tweets";
 
     TwitterScraper() {
         twitter = getTwitter();
-        tweets = new ArrayList<>();
         queries = new ArrayList<>();
+        db = new DatabaseWrapper();
         resetLimitMap();
         setQueries();
     }
@@ -45,35 +46,38 @@ class TwitterScraper {
     /**
      * Run the configured Queries and handle the results
      */
-    void run(final boolean resetList) {
-        if (resetList) setQueries();
+    void run() {
+        setQueries();
         new Thread(() -> {
-            //checkLimits();
+            resetLimitMap();
+            try {
+                boolean ready = waitOnLimit(RATE_LIMIT_STATUS, 2);
+                ready &= waitOnLimit(SEARCH_TWEETS, queries.size() + 1);
+                if (!ready) {
+                    logger.log("Cannot get tweets because of Rate Limits");
+                    return;
+                }
+            } catch (InterruptedException e) {
+                logger.e("Error waiting on Rate Limits", e);
+                return;
+            }
             queries.forEach(query -> {
                 try {
-                    QueryResult result;
-                    result = twitter.search(query);
-                    logger.log("");
-                    logger.log("Results for: " + query.toString());
-                    logger.log("");
-                    result.getTweets().forEach(this::handleTweet);
+                    long mostRecent = db.getMostRecent(query.getModel().getQueryName());
+                    logger.log(String.format("Most Recent Tweet was ID %d", mostRecent));
+                    //query.getQuery().sinceId(mostRecent);
+                    // Uncomment this line to make it so that the query only gets new tweets
+                    final QueryResult result = twitter.search(query.getQuery());
+                    final List<Status> tweets = result.getTweets();
+                    logger.log(String.format("Query %s returned %d results",
+                            query.getModel().getQueryName(),
+                            tweets.size()));
+                    tweets.forEach(tweet -> handleTweet(tweet, query));
                 } catch (Exception e) {
-                    logger.e(e);
+                    logger.e("Error handling query " + query.getModel().getQueryName(), e);
                 }
             });
-            try {
-                logger.json(tweets, "tweets.json");
-            } catch (IOException e) {
-                logger.e(e);
-            }
-            try {
-                resetLimitMap();
-                boolean ready = waitOnLimit(RATE_LIMIT_STATUS, 1);
-                ready &= waitOnLimit(SEARCH_TWEETS, 2);
-                if (ready) run(true);
-            } catch (InterruptedException e) {
-                logger.e(e);
-            }
+            this.run();
         }).run();
     }
 
@@ -85,9 +89,10 @@ class TwitterScraper {
         }
         logger.log(String.format("Limit for %s is %d", limitName, limit.getRemaining()));
         if (limit.getRemaining() <= minLimit) {
-            final long sleep = limit.getSecondsUntilReset();
-            logger.log(String.format("Sleeping for %d seconds to refresh %s limit",
-                    sleep,
+            final long sleep = limit.getSecondsUntilReset() + 1;
+            // Extra second to account for race conditions
+            logger.log(String.format("Sleeping for %s to refresh \"%s\" limit",
+                    millisToReadableTime(sleep * 1000),
                     limitName));
             Thread.sleep(sleep * 1000);
         } else {
@@ -98,31 +103,23 @@ class TwitterScraper {
         return true;
     }
 
-    public void run() {
-        run(false);
-    }
-
     private void setQueries() {
-        Optional.ofNullable(getConfig()).ifPresent(config -> setQueryList(config.convertQueries()));
+        Optional.ofNullable(getConfig()).ifPresent(config ->
+                setQueryList(config.convertQueries()));
     }
 
-    TwitterScraper setTweetHandler(Consumer<Status> handleTweet) {
-        this.handleTweet = handleTweet;
-        return this;
-    }
-
-    TwitterScraper setQueryList(final List<Query> queries) {
+    private TwitterScraper setQueryList(final List<com.twitterscraper.model.Query> queries) {
         this.queries.clear();
         this.queries.addAll(queries);
         return this;
     }
 
-    private void handleTweet(Status tweet) {
-        tweets.add(tweet);
-        Optional.ofNullable(handleTweet).orElse(TwitterScraper::printTweet).accept(tweet);
+    private void handleTweet(Status tweet, Query query) {
+        //printTweet(tweet);
+        db.upsert(tweet, query.getModel().queryName);
     }
 
-    static void printTweet(Status tweet) {
+    private static void printTweet(final Status tweet) {
         logger.log(new TweetPrinter(tweet).toString());
     }
 
