@@ -4,6 +4,6 @@ const router = express.Router()
 
 const TwitterController = require('../../controllers/twitterscraper.controller');
 
-router.get('/', TwitterController.getTweets)
+router.get('/:collection', TwitterController.getTweets)
 
 module.exports = router;
