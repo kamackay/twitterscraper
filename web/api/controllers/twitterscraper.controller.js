@@ -24,7 +24,6 @@ exports.getTweets = async function(req, res, next) {
 			});
 	} catch (e) {
 		//Return an Error Response Message with Code and the Error Message.
-
 		return res.status(400).json({ status: 400, message: e.message });
 	}
 };

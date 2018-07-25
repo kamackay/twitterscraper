@@ -1,13 +1,14 @@
 package com.twitterscraper;
 
-import com.twitterscraper.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Entry point class
  */
 public class Main {
 
-    private static final Logger logger = new Logger(Main.class);
+    private static Logger logger = LoggerFactory.getLogger(Main.class);
 
     /**
      * Main
@@ -19,7 +20,7 @@ public class Main {
             new TwitterScraper()
                     .start();
         } catch (Exception e) {
-            logger.e(e);
+            logger.error("Error Running TwitterScraper!", e);
         }
     }
 }

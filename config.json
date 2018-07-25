@@ -2,19 +2,23 @@
 	"queries": [
 		{
 			"queryName": "TrumpMentions",
-			"mentions": ["realDonaldTrump"]
+			"mentions": ["realDonaldTrump"],
+			"updateExisting": true
 		},
 		{
 			"queryName": "ElonMuskMentions",
-			"mentions": ["elonmusk"]
+			"mentions": ["elonmusk"],
+			"updateExisting": true
 		},
 		{
 			"queryName": "#maga",
-			"hashtags": ["maga"]
+			"hashtags": ["maga"],
+			"updateExisting": true
 		},
 		{
 			"queryName": "ObamaMentions",
-			"mentions": ["BarackObama"]
+			"mentions": ["BarackObama"],
+			"updateExisting": true
 		}
 	]
 }

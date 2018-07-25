@@ -2,9 +2,9 @@ package com.twitterscraper;
 
 import com.google.gson.Gson;
 import com.twitterscraper.db.DatabaseWrapper;
-import com.twitterscraper.logging.Logger;
 import com.twitterscraper.model.Config;
 import com.twitterscraper.utils.Elective;
+import org.slf4j.LoggerFactory;
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
 
@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.twitterscraper.db.Transforms.millisToReadableTime;
+import static com.twitterscraper.utils.BenchmarkData.data;
 import static com.twitterscraper.utils.BenchmarkTimer.timer;
 
 
@@ -23,7 +24,7 @@ class TwitterScraper {
 
     private Map<String, RateLimitStatus> limitMap;
 
-    private final Logger logger = new Logger(getClass());
+    private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
     private List<com.twitterscraper.model.Query> queries;
     private final Twitter twitter;
     private final DatabaseWrapper db;
@@ -57,25 +58,26 @@ class TwitterScraper {
     private void run() {
         try {
             while (true) {
+                timer().setLogLimit(100).start(data("SetQueries", 10));
                 setQueries();
-                timer().setLogLimit(100).start("ResetLimitMap");
+                timer().end("SetQueries").start(data("ResetLimitMap", 10));
                 resetLimitMap();
-                timer().end("ResetLimitMap").start("WaitOnLimit");
+                timer().end("ResetLimitMap").start(data("WaitOnLimit", 1000));
                 try {
                     boolean ready = waitOnLimit(RATE_LIMIT_STATUS, 2);
                     ready &= waitOnLimit(SEARCH_TWEETS, queries.size() + 1);
                     if (!ready) {
-                        logger.log("Cannot get tweets because of Rate Limits or internet connection");
+                        logger.error("Cannot get tweets because of Rate Limits or internet connection");
                         return;
                     }
                 } catch (InterruptedException e) {
-                    logger.e("Error waiting on Rate Limits", e);
+                    logger.error("Error waiting on Rate Limits", e);
                     return;
                 }
                 timer().end("WaitOnLimit");
                 queries.forEach(query -> {
                     final String queryName = query.getModel().getQueryName();
-                    timer().start("QueryHandle." + queryName);
+                    timer().start(data("QueryHandle." + queryName, 500));
                     try {
                         db.verifyIndex(queryName);
                         if (!query.getModel().getUpdateExisting())
@@ -87,20 +89,20 @@ class TwitterScraper {
                                 .filter(tweet -> db.upsert(tweet, queryName))
                                 .count();
                         if (newTweets > 0)
-                            logger.log(String.format("Query %s returned %d results, %d of which were new",
+                            logger.info(String.format("Query %s returned %d results, %d of which were new",
                                     queryName,
                                     tweets.size(),
                                     newTweets));
-                        else logger.log("No new results from " + queryName);
+                        //else logger.log("No new results from " + queryName);
                     } catch (Exception e) {
-                        logger.e("Error handling query " + queryName, e);
+                        logger.error("Error handling query " + queryName, e);
                     } finally {
                         timer().end("QueryHandle." + queryName);
                     }
                 });
             }
         } catch (Exception e) {
-            logger.e("Exception running TwitterScraper", e);
+            logger.error("Exception running TwitterScraper", e);
         }
     }
 
@@ -113,7 +115,7 @@ class TwitterScraper {
         if (limit.getRemaining() <= minLimit) {
             final long sleep = limit.getSecondsUntilReset() + 1;
             // Extra second to account for race conditions
-            logger.log(String.format("Sleeping for %s to refresh \"%s\" limit",
+            logger.info(String.format("Sleeping for %s to refresh \"%s\" limit",
                     millisToReadableTime(sleep * 1000),
                     limitName));
             if (sleep >= 0) Thread.sleep(sleep * 1000);
@@ -159,7 +161,7 @@ class TwitterScraper {
         try {
             return new Gson().fromJson(new FileReader("config.json"), Config.class);
         } catch (FileNotFoundException e) {
-            logger.e(e);
+            logger.error("Error Finding Config File", e);
             return null;
         }
     }

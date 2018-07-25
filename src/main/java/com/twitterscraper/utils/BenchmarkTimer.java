@@ -1,6 +1,7 @@
 package com.twitterscraper.utils;
 
-import com.twitterscraper.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,8 +16,8 @@ public class BenchmarkTimer {
     private static BenchmarkTimer instance = null;
     private long limit = 0;
 
-    private final Logger logger = new Logger(getClass());
-    private final Map<String, Long> startTimes;
+    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final Map<String, BenchmarkData> startTimes;
 
     public static BenchmarkTimer timer() {
         if (instance == null)
@@ -29,15 +30,17 @@ public class BenchmarkTimer {
         startTimes = new HashMap<>();
     }
 
-    public BenchmarkTimer start(final String benchmarkName) {
-        startTimes.put(benchmarkName, System.currentTimeMillis());
+    public BenchmarkTimer start(final BenchmarkData data) {
+        startTimes.put(data.getName(), data);
         return this;
     }
 
     public BenchmarkTimer end(final String benchmarkName) {
-        final long time = System.currentTimeMillis() - startTimes.getOrDefault(benchmarkName, 0L);
-        if (time > limit) {
-            logger.log(String.format("Benchmark %s completed in %s",
+        final Elective<BenchmarkData> data = get(benchmarkName);
+        final long time = System.currentTimeMillis() -
+                data.map(BenchmarkData::getStartTime).orElse(-1L);
+        if (time > data.map(BenchmarkData::getLimit).orElse(limit)) {
+            logger.info(String.format("Benchmark \"%s\" completed in %s",
                     benchmarkName,
                     millisToReadableTime(time)));
         }
@@ -54,4 +57,7 @@ public class BenchmarkTimer {
         return this;
     }
 
+    private Elective<BenchmarkData> get(final String name) {
+        return Elective.ofNullable(startTimes.get(name));
+    }
 }
