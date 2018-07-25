@@ -1,9 +1,11 @@
-package com.twitterscraper.utils;
+package com.twitterscraper.utils.benchmark;
 
 /**
  * Class used by the BenchmarkTimer to track timers
  */
 public class BenchmarkData {
+
+    private boolean logAbsolute;
     private final long startTime;
     private final long limit;
     private final String name;
@@ -12,6 +14,7 @@ public class BenchmarkData {
         this.name = name;
         this.startTime = System.currentTimeMillis();
         this.limit = limit;
+        this.logAbsolute = false;
     }
 
     /**
@@ -44,5 +47,14 @@ public class BenchmarkData {
      */
     public String getName() {
         return name;
+    }
+
+    public BenchmarkData logAbsolute(final boolean logAbsolute) {
+        this.logAbsolute = logAbsolute;
+        return this;
+    }
+
+    public boolean getLogAbsolute() {
+        return logAbsolute;
     }
 }

@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.twitterscraper.db.Transforms.millisToReadableTime;
-import static com.twitterscraper.utils.BenchmarkData.data;
-import static com.twitterscraper.utils.BenchmarkTimer.timer;
+import static com.twitterscraper.utils.benchmark.BenchmarkData.data;
+import static com.twitterscraper.utils.benchmark.BenchmarkTimer.timer;
 
 
 class TwitterScraper {
@@ -32,7 +32,7 @@ class TwitterScraper {
     private static final String RATE_LIMIT_STATUS = "/application/rate_limit_status";
     private static final String SEARCH_TWEETS = "/search/tweets";
 
-    TwitterScraper() throws Exception {
+    TwitterScraper() {
         twitter = getTwitter();
         queries = new ArrayList<>();
         db = new DatabaseWrapper();
@@ -42,6 +42,7 @@ class TwitterScraper {
 
     private Twitter getTwitter() {
         return new TwitterFactory(new ConfigurationBuilder()
+                .setGZIPEnabled(true)
                 .setTweetModeExtended(true)
                 .build())
                 .getInstance();
@@ -58,11 +59,14 @@ class TwitterScraper {
     private void run() {
         try {
             while (true) {
-                timer().setLogLimit(100).start(data("SetQueries", 10));
+                timer().setLogLimit(100)
+                        .start(data("SetQueries", 10).logAbsolute(true));
                 setQueries();
-                timer().end("SetQueries").start("ResetLimitMap");
+                timer().end("SetQueries")
+                        .start("ResetLimitMap");
                 resetLimitMap();
-                timer().end("ResetLimitMap").start(data("WaitOnLimit", 1000));
+                timer().end("ResetLimitMap")
+                        .start(data("WaitOnLimit", 1000));
                 try {
                     boolean ready = waitOnLimit(RATE_LIMIT_STATUS, 2);
                     ready &= waitOnLimit(SEARCH_TWEETS, queries.size() + 1);
@@ -127,12 +131,10 @@ class TwitterScraper {
         return true;
     }
 
-    private void setQueries() throws Exception {
+    private void setQueries() {
         Elective.ofNullable(getConfig())
                 .ifPresent(config -> setQueryList(config.convertQueries()))
-                .orElse(() -> {
-                    throw new IllegalStateException("Could not load config");
-                });
+                .orElse(() -> logger.error("Could not load config"));
     }
 
     private TwitterScraper setQueryList(final List<com.twitterscraper.model.Query> queries) {
