@@ -54,7 +54,10 @@ public class BenchmarkData {
         return this;
     }
 
-    public boolean getLogAbsolute() {
+    /**
+     * @return whether to log this no matter how long the benchmark took
+     */
+    boolean getLogAbsolute() {
         return logAbsolute;
     }
 }
