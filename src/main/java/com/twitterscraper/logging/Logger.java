@@ -13,6 +13,7 @@ import java.util.Date;
 /**
  * Placeholder logging class
  */
+@Deprecated // Using SLF4J now
 public class Logger {
 
     private final Class classname;

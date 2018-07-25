@@ -1,4 +1,4 @@
-package com.twitterscraper.twitter.utils;
+package com.twitterscraper.utils;
 
 import com.sun.istack.internal.NotNull;
 import com.twitterscraper.model.QueryModel;

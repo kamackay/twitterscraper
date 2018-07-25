@@ -1,6 +1,6 @@
 package com.twitterscraper.db;
 
-import com.twitterscraper.twitter.utils.TweetPrinter;
+import com.twitterscraper.utils.TweetPrinter;
 import org.bson.Document;
 import twitter4j.*;
 
@@ -110,13 +110,14 @@ public class Transforms {
                 .append("isVerified", u.isVerified());
     }
 
+    private final static long DAY = 86400000;
     private final static long HOUR = 3600000;
     private final static long MINUTE = 60000;
     private final static long SECOND = 1000;
 
     public static String millisToReadableTime(long millis) {
         final StringBuilder builder = new StringBuilder();
-        millis = readableTimeHelper(millis, HOUR * 24, "days", builder);
+        millis = readableTimeHelper(millis, DAY, "days", builder);
         millis = readableTimeHelper(millis, HOUR, "hours", builder);
         millis = readableTimeHelper(millis, MINUTE, "minutes", builder);
         millis = readableTimeHelper(millis, SECOND, "seconds", builder);

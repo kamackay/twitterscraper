@@ -1,6 +1,6 @@
 package com.twitterscraper.model;
 
-import com.twitterscraper.twitter.utils.QueryBuilder;
+import com.twitterscraper.utils.QueryBuilder;
 
 import java.util.List;
 
