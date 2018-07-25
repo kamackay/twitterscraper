@@ -9,8 +9,6 @@ var tweetSchema = new mongoose.Schema({
 
 tweetSchema.plugin(mongoosePaginate);
 
-module.exports = {
-	get: collectionName => {
-		return mongoose.model("Tweets", tweetSchema, collectionName);
-	}
+exports.get = collectionName => {
+	return mongoose.model("Tweets", tweetSchema, collectionName);
 };

@@ -27,3 +27,21 @@ exports.getTweets = async function(req, res, next) {
 		return res.status(400).json({ status: 400, message: e.message });
 	}
 };
+
+exports.count = async function (req, res, next) {
+	const collection = req.params.collection;
+	try {
+		var tweets = await twitterService.countTweets(collection);
+
+		return res
+			.status(200)
+			.json({
+				status: 200,
+				data: tweets,
+				message: "Succesfully Counted Tweets"
+			});
+	} catch (e) {
+		//Return an Error Response Message with Code and the Error Message.
+		return res.status(400).json({ status: 400, message: e.message });
+	}
+};
