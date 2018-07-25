@@ -60,7 +60,7 @@ class TwitterScraper {
             while (true) {
                 timer().setLogLimit(100).start(data("SetQueries", 10));
                 setQueries();
-                timer().end("SetQueries").start(data("ResetLimitMap", 10));
+                timer().end("SetQueries").start("ResetLimitMap");
                 resetLimitMap();
                 timer().end("ResetLimitMap").start(data("WaitOnLimit", 1000));
                 try {
