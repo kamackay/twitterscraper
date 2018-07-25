@@ -4,16 +4,19 @@ import com.google.gson.Gson;
 import com.twitterscraper.db.DatabaseWrapper;
 import com.twitterscraper.logging.Logger;
 import com.twitterscraper.model.Config;
-import com.twitterscraper.utils.BenchmarkTimer;
 import com.twitterscraper.utils.Elective;
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.twitterscraper.db.Transforms.millisToReadableTime;
+import static com.twitterscraper.utils.BenchmarkTimer.timer;
 
 
 class TwitterScraper {
@@ -55,9 +58,9 @@ class TwitterScraper {
         try {
             while (true) {
                 setQueries();
-                BenchmarkTimer.instance().setLogLimit(100).start("ResetLimitMap");
+                timer().setLogLimit(100).start("ResetLimitMap");
                 resetLimitMap();
-                BenchmarkTimer.instance().end("ResetLimitMap").start("WaitOnLimit");
+                timer().end("ResetLimitMap").start("WaitOnLimit");
                 try {
                     boolean ready = waitOnLimit(RATE_LIMIT_STATUS, 2);
                     ready &= waitOnLimit(SEARCH_TWEETS, queries.size() + 1);
@@ -69,15 +72,15 @@ class TwitterScraper {
                     logger.e("Error waiting on Rate Limits", e);
                     return;
                 }
-                BenchmarkTimer.instance().end("WaitOnLimit");
+                timer().end("WaitOnLimit");
                 queries.forEach(query -> {
                     final String queryName = query.getModel().getQueryName();
-                    BenchmarkTimer.instance().start("QueryHandle." + queryName);
+                    timer().start("QueryHandle." + queryName);
                     try {
                         db.verifyIndex(queryName);
                         if (!query.getModel().getUpdateExisting())
                             query.getQuery().sinceId(db.getMostRecent(queryName));
-                        // Uncomment this line to make it so that the query only gets new tweets
+                        
                         final QueryResult result = twitter.search(query.getQuery());
                         final List<Status> tweets = result.getTweets();
                         final long newTweets = tweets.parallelStream()
@@ -92,7 +95,7 @@ class TwitterScraper {
                     } catch (Exception e) {
                         logger.e("Error handling query " + queryName, e);
                     } finally {
-                        BenchmarkTimer.instance().end("QueryHandle." + queryName);
+                        timer().end("QueryHandle." + queryName);
                     }
                 });
             }

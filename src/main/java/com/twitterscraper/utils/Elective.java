@@ -13,7 +13,7 @@ import java.util.function.Supplier;
  */
 public class Elective<T> {
     /**
-     * Common instance for {@code empty()}.
+     * Common timer for {@code empty()}.
      */
     private static final Elective<?> EMPTY = new Elective<>();
 
@@ -23,9 +23,9 @@ public class Elective<T> {
     private final T value;
 
     /**
-     * Constructs an empty instance.
+     * Constructs an empty timer.
      *
-     * @implNote Generally only one empty instance, {@link Elective#EMPTY},
+     * @implNote Generally only one empty timer, {@link Elective#EMPTY},
      * should exist per VM.
      */
     private Elective() {
@@ -33,7 +33,7 @@ public class Elective<T> {
     }
 
     /**
-     * Returns an empty {@code Elective} instance.  No value is present for this
+     * Returns an empty {@code Elective} timer.  No value is present for this
      * Elective.
      *
      * @param <T> Type of the non-existent value
@@ -50,7 +50,7 @@ public class Elective<T> {
     }
 
     /**
-     * Constructs an instance with the value present.
+     * Constructs an timer with the value present.
      *
      * @param value the non-null value to be present
      * @throws NullPointerException if value is null
@@ -295,7 +295,7 @@ public class Elective<T> {
      * debugging. The exact presentation format is unspecified and may vary
      * between implementations and versions.
      *
-     * @return the string representation of this instance
+     * @return the string representation of this timer
      * @implSpec If a value is present the result must include its string
      * representation in the result. Empty and present Electives must be
      * unambiguously differentiable.

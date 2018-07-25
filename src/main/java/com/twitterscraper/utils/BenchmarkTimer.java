@@ -18,7 +18,7 @@ public class BenchmarkTimer {
     private final Logger logger = new Logger(getClass());
     private final Map<String, Long> startTimes;
 
-    public static BenchmarkTimer instance() {
+    public static BenchmarkTimer timer() {
         if (instance == null)
             instance = new BenchmarkTimer();
 
