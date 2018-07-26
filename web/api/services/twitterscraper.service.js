@@ -24,9 +24,9 @@ exports.getTweets = async function(collection, query, page, limit) {
 };
 
 exports.countTweets = async function(collection) {
-
 	try {
 		var tweets = await twitter.get(collection).countDocuments();
+		console.log('Collection "' + collection + '" has ' + tweets + " documents");
 		return tweets;
 	} catch (e) {
 		console.log(e);
@@ -34,4 +34,3 @@ exports.countTweets = async function(collection) {
 		throw Error("Error while Paginating Tweets");
 	}
 };
-

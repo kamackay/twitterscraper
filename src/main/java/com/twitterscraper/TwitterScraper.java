@@ -60,7 +60,7 @@ class TwitterScraper {
         try {
             while (true) {
                 timer().setLogLimit(100)
-                        .start(data("SetQueries", 10).logAbsolute(true));
+                        .start(data("SetQueries", 10));
                 setQueries();
                 timer().end("SetQueries")
                         .start("ResetLimitMap");
@@ -93,10 +93,10 @@ class TwitterScraper {
                                 .filter(tweet -> db.upsert(tweet, queryName))
                                 .count();
                         if (newTweets > 0)
-                            logger.info(String.format("Query %s returned %d results, %d of which were new",
+                            logger.info("Query {} returned {} results, {} of which were new",
                                     queryName,
                                     tweets.size(),
-                                    newTweets));
+                                    newTweets);
                         //else logger.log("No new results from " + queryName);
                     } catch (Exception e) {
                         logger.error("Error handling query " + queryName, e);
@@ -119,15 +119,11 @@ class TwitterScraper {
         if (limit.getRemaining() <= minLimit) {
             final long sleep = limit.getSecondsUntilReset() + 1;
             // Extra second to account for race conditions
-            logger.info(String.format("Sleeping for %s to refresh \"%s\" limit",
+            logger.info("Sleeping for {} to refresh \"{}\" limit",
                     millisToReadableTime(sleep * 1000),
-                    limitName));
+                    limitName);
             if (sleep >= 0) Thread.sleep(sleep * 1000);
-        } //else {
-            //logger.log(String.format("%d requests remaining for %s",
-            //        limit.getRemaining(),
-            //        limitName));
-        //}
+        }
         return true;
     }
 

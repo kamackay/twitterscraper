@@ -69,11 +69,12 @@ public class BenchmarkTimer {
         dataElective.ifPresent(data -> {
             final long time = System.currentTimeMillis() - data.getStartTime();
             if (time > data.getLimit() || data.getLogAbsolute()) {
-                logger.warn(String.format("Benchmark \"%s\" completed in %s",
+                logger.warn("Benchmark \"{}\" completed in {}",
                         benchmarkName,
-                        millisToReadableTime(time)));
+                        millisToReadableTime(time));
             }
-        }).orElse(() -> logger.warn("Call to end Benchmark \"{}\" without initializing", benchmarkName));
+        }).orElse(() -> logger.warn("Call to end Benchmark \"{}\" without initializing first",
+                benchmarkName));
         return this;
     }
 
