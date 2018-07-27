@@ -65,20 +65,21 @@ class TwitterScraper {
                 timer().end("SetQueries")
                         .start("ResetLimitMap");
                 resetLimitMap();
-                timer().end("ResetLimitMap")
-                        .start(data("WaitOnLimit", 1000));
+                timer().end("ResetLimitMap");
                 try {
                     boolean ready = waitOnLimit(RATE_LIMIT_STATUS, 2);
                     ready &= waitOnLimit(SEARCH_TWEETS, queries.size() + 1);
                     if (!ready) {
                         logger.error("Cannot get tweets because of Rate Limits or internet connection");
                         return;
+                    } else {
+                        logger.info("Waiting for 10 seconds to span out API requests");
+                        Thread.sleep(10000);
                     }
                 } catch (InterruptedException e) {
                     logger.error("Error waiting on Rate Limits", e);
                     return;
                 }
-                timer().end("WaitOnLimit");
                 queries.forEach(query -> {
                     final String queryName = query.getModel().getQueryName();
                     timer().start(data("QueryHandle." + queryName, 500));

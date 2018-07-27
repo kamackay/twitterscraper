@@ -6,9 +6,9 @@
 			"updateExisting": true
 		},
 		{
-			"queryName": "ElonMuskMentions",
-			"mentions": ["elonmusk"],
-			"updateExisting": true
+			"queryName": "OcasioMentions",
+			"mentions": ["Ocasio2018"],
+			"updateExisting": false
 		},
 		{
 			"queryName": "#maga",
