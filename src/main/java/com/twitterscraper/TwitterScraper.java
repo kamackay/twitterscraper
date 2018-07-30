@@ -3,6 +3,7 @@ package com.twitterscraper;
 import com.google.gson.Gson;
 import com.twitterscraper.db.DatabaseWrapper;
 import com.twitterscraper.model.Config;
+import com.twitterscraper.monitors.AbstractMonitor;
 import com.twitterscraper.utils.Elective;
 import org.slf4j.LoggerFactory;
 import twitter4j.*;
@@ -10,11 +11,10 @@ import twitter4j.conf.ConfigurationBuilder;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import static com.twitterscraper.RateLimit.RATE_LIMIT_STATUS;
+import static com.twitterscraper.RateLimit.SEARCH_TWEETS;
 import static com.twitterscraper.db.Transforms.millisToReadableTime;
 import static com.twitterscraper.utils.benchmark.BenchmarkData.data;
 import static com.twitterscraper.utils.benchmark.BenchmarkTimer.timer;
@@ -25,17 +25,17 @@ class TwitterScraper {
     private Map<String, RateLimitStatus> limitMap;
 
     private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
-    private List<com.twitterscraper.model.Query> queries;
+    private final List<com.twitterscraper.model.Query> queries;
     private final Twitter twitter;
     private final DatabaseWrapper db;
-
-    private static final String RATE_LIMIT_STATUS = "/application/rate_limit_status";
-    private static final String SEARCH_TWEETS = "/search/tweets";
+    private final Set<AbstractMonitor> monitors;
 
     TwitterScraper() {
         twitter = getTwitter();
         queries = new ArrayList<>();
         db = new DatabaseWrapper();
+        monitors = new HashSet<>();
+        //Sets.newHashSet(new UpdateMonitor(twitter, db));
         resetLimitMap();
         setQueries();
     }
@@ -54,8 +54,10 @@ class TwitterScraper {
     void start() {
         new Thread(this::run)
                 .start();
+        monitors.forEach(AbstractMonitor::start);
     }
 
+    // TODO set this up in it's own Monitor
     private void run() {
         try {
             while (true) {
@@ -73,8 +75,9 @@ class TwitterScraper {
                         logger.error("Cannot get tweets because of Rate Limits or internet connection");
                         return;
                     } else {
-                        logger.info("Waiting for 10 seconds to span out API requests");
-                        Thread.sleep(10000);
+                        final int seconds = queries.size();
+                        logger.info("Waiting for {} seconds to span out API requests", seconds);
+                        Thread.sleep(1000 * seconds);
                     }
                 } catch (InterruptedException e) {
                     logger.error("Error waiting on Rate Limits", e);
@@ -111,8 +114,8 @@ class TwitterScraper {
         }
     }
 
-    private boolean waitOnLimit(final String limitName, final int minLimit) throws InterruptedException {
-        final RateLimitStatus limit = limitMap.get(limitName);
+    private boolean waitOnLimit(final RateLimit rateLimit, final int minLimit) throws InterruptedException {
+        final RateLimitStatus limit = limitMap.get(rateLimit.getName());
         if (limit == null) {
             Thread.sleep(1000);
             return false;
@@ -122,7 +125,7 @@ class TwitterScraper {
             // Extra second to account for race conditions
             logger.info("Sleeping for {} to refresh \"{}\" limit",
                     millisToReadableTime(sleep * 1000),
-                    limitName);
+                    rateLimit.getName());
             if (sleep >= 0) Thread.sleep(sleep * 1000);
         }
         return true;
@@ -137,6 +140,8 @@ class TwitterScraper {
     private TwitterScraper setQueryList(final List<com.twitterscraper.model.Query> queries) {
         this.queries.clear();
         this.queries.addAll(queries);
+        monitors.forEach(abstractMonitor ->
+                abstractMonitor.setQueries(new ArrayList<>(this.queries)));
         return this;
     }
 

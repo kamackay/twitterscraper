@@ -1,5 +1,7 @@
 package com.twitterscraper.model;
 
+import com.twitterscraper.utils.Elective;
+
 public class Query {
     private twitter4j.Query query;
     private QueryModel model;
@@ -25,5 +27,11 @@ public class Query {
     public Query setModel(QueryModel model) {
         this.model = model;
         return this;
+    }
+
+    public String getName() {
+        return Elective.of(model)
+                .map(QueryModel::getQueryName)
+                .orElse(null);
     }
 }
