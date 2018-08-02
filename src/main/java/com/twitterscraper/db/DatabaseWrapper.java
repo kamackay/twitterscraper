@@ -8,15 +8,15 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.UpdateOptions;
 import com.sun.istack.internal.NotNull;
+import com.twitterscraper.utils.Benchmark;
+import com.twitterscraper.utils.Elective;
 import org.bson.Document;
 import twitter4j.Status;
 
 import java.util.Arrays;
-import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
-import static com.twitterscraper.db.Transforms.ID;
-import static com.twitterscraper.db.Transforms.convert;
+import static com.twitterscraper.db.Transforms.*;
 
 public class DatabaseWrapper {
     private final MongoDatabase db;
@@ -66,11 +66,21 @@ public class DatabaseWrapper {
      * @return - The ID of the most recent tweet in this collection
      */
     public long getMostRecent(@NotNull final String collectionName) {
-        return Optional.ofNullable(db.getCollection(collectionName)
+        return Elective.ofNullable(db.getCollection(collectionName)
                 .find()
                 .sort(new Document(ID, -1))
                 .first())
                 .map(d -> d.getLong(ID))
                 .orElse(-1L);
+    }
+
+    @Benchmark
+    public int getMostRetweets(@NotNull final String collectionName) {
+        return Elective.ofNullable(db.getCollection(collectionName)
+                .find()
+                .sort(new Document(RETWEET_COUNT, -1))
+                .first())
+                .map(d -> d.getInteger(RETWEET_COUNT))
+                .orElse(-1);
     }
 }

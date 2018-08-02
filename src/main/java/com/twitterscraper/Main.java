@@ -1,5 +1,7 @@
 package com.twitterscraper;
 
+import com.google.inject.Guice;
+import com.twitterscraper.utils.benchmark.MainModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,8 +19,7 @@ public class Main {
      */
     public static void main(String[] args) {
         try {
-            new TwitterScraper()
-                    .start();
+            Guice.createInjector(new MainModule()).getInstance(TwitterScraper.class).start();
         } catch (Exception e) {
             logger.error("Error Running TwitterScraper!", e);
         }

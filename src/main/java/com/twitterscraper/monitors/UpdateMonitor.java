@@ -2,10 +2,12 @@ package com.twitterscraper.monitors;
 
 import com.twitterscraper.db.DatabaseWrapper;
 import com.twitterscraper.model.Query;
+import com.twitterscraper.utils.Elective;
 import twitter4j.Status;
-import twitter4j.Twitter;
 
-import static com.twitterscraper.RateLimit.STATUSES_SHOW;
+import java.util.ArrayList;
+
+import static com.twitterscraper.twitter.TwitterWrapper.twitter;
 
 /**
  * This is more of an example of a monitor, and not actually all that useful
@@ -13,27 +15,23 @@ import static com.twitterscraper.RateLimit.STATUSES_SHOW;
 public class UpdateMonitor extends AbstractMonitor {
 
     public UpdateMonitor(
-            final Twitter twitter,
             final DatabaseWrapper db) {
-        super(twitter, db);
+        super(db);
     }
 
     @Override
     void run() {
-        waitOnLimitSafe(STATUSES_SHOW, queries.size());
-        queries.parallelStream().forEach(this::handleQuery);
+        new ArrayList<>(queries).forEach(this::handleQuery);
     }
 
     private void handleQuery(final Query query) {
-        try {
-            long id = db.getMostRecent(query.getName());
-            final Status tweet = twitter.showStatus(id);
+        final long id = db.getMostRetweets(query.getName());
+        final Elective<Status> safeTweet = twitter().getTweetSafe(id);
+        safeTweet.ifPresent(tweet -> {
             db.upsert(tweet, query.getName());
             logger.info("Updated ID {} for Query {}",
                     id, query.getName());
-        } catch (Exception e) {
-            logger.error("Error Handling Query", e);
-        }
+        });
     }
 
     @Override

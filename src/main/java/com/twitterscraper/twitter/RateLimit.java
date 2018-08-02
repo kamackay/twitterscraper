@@ -1,4 +1,4 @@
-package com.twitterscraper;
+package com.twitterscraper.twitter;
 
 public enum RateLimit {
     RATE_LIMIT_STATUS("/application/rate_limit_status"),

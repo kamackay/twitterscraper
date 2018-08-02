@@ -13,13 +13,15 @@ import static java.util.stream.Collectors.toList;
 public class Transforms {
 
     static final String ID = "id";
+    static final String RETWEET_COUNT = "retweetCount";
+    static final String FAVORITE_COUNT = "favoriteCount";
 
     static Document convert(final Status tweet) {
         final Document document = new Document(ID, tweet.getId())
                 .append("text", tweet.getText())
-                .append("retweetCount", tweet.getRetweetCount())
+                .append(RETWEET_COUNT, tweet.getRetweetCount())
                 .append("createdAt", tweet.getCreatedAt())
-                .append("favoriteCount", tweet.getFavoriteCount())
+                .append(FAVORITE_COUNT, tweet.getFavoriteCount())
                 .append("lang", tweet.getLang())
                 .append("inReplyToUserId", tweet.getInReplyToUserId())
                 .append("inReplyToScreenName", tweet.getInReplyToScreenName())
