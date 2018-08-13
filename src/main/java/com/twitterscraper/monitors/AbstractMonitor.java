@@ -1,5 +1,6 @@
 package com.twitterscraper.monitors;
 
+import com.twitterscraper.db.DatabaseWrapper;
 import com.twitterscraper.model.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +12,10 @@ public abstract class AbstractMonitor {
 
     volatile List<Query> queries;
 
-    public AbstractMonitor() {
+    protected final DatabaseWrapper db;
+
+    public AbstractMonitor(final DatabaseWrapper db) {
+        this.db = db;
         queries = new ArrayList<>();
     }
 

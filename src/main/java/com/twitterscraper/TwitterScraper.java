@@ -2,6 +2,7 @@ package com.twitterscraper;
 
 import com.google.gson.Gson;
 import com.google.inject.Inject;
+import com.twitterscraper.db.DatabaseWrapper;
 import com.twitterscraper.model.Config;
 import com.twitterscraper.model.Query;
 import com.twitterscraper.monitors.AbstractMonitor;
@@ -19,12 +20,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.twitterscraper.db.DatabaseWrapper.db;
 import static com.twitterscraper.db.Transforms.millisToReadableTime;
 import static com.twitterscraper.twitter.TwitterWrapper.getWaitTimeForQueries;
 import static com.twitterscraper.twitter.TwitterWrapper.twitter;
-import static com.twitterscraper.utils.benchmark.BenchmarkData.data;
-import static com.twitterscraper.utils.benchmark.BenchmarkTimer.timer;
 
 
 public class TwitterScraper {
@@ -34,10 +32,13 @@ public class TwitterScraper {
 
     private final Set<AbstractMonitor> monitors;
     private final UpdateMonitor updateMonitor;
+    private final DatabaseWrapper db;
 
     @Inject
-    TwitterScraper(final UpdateMonitor updateMonitor) {
+    TwitterScraper(final UpdateMonitor updateMonitor,
+                   final DatabaseWrapper db) {
         this.updateMonitor = updateMonitor;
+        this.db = db;
         queries = new ArrayList<>();
         monitors = new HashSet<>();
         reconfigure();
@@ -55,12 +56,7 @@ public class TwitterScraper {
     private void run() {
         try {
             while (true) {
-                timer().setLogLimit(100)
-                        .start(data("SetQueries", 10));
                 reconfigure();
-                timer().end("SetQueries")
-                        .start("ResetLimitMap");
-                timer().end("ResetLimitMap");
                 queries.parallelStream().forEach(query -> handleQuery(query.getName(), query));
                 monitors.forEach(AbstractMonitor::run);
 
@@ -77,12 +73,12 @@ public class TwitterScraper {
         }
     }
 
-    @Benchmark(paramName = true)
+    @Benchmark(paramName = true, limit = 1000)
     void handleQuery(final String queryName, final Query query) {
         try {
-            db().verifyIndex(queryName);
+            db.verifyIndex(queryName);
             if (!query.getModel().getUpdateExisting())
-                query.getQuery().sinceId(db().getMostRecent(queryName));
+                query.getQuery().sinceId(db.getMostRecent(queryName));
 
             final Elective<QueryResult> safeResult = twitter().searchSafe(query.getQuery());
             if (!safeResult.isPresent()) {
@@ -98,7 +94,7 @@ public class TwitterScraper {
     private void handleResult(final QueryResult result, final String queryName) {
         final List<Status> tweets = result.getTweets();
         final long newTweets = tweets.parallelStream()
-                .filter(tweet -> db().upsert(tweet, queryName))
+                .filter(tweet -> db.upsert(tweet, queryName))
                 .count();
         if (newTweets > 0)
             logger.info("Query {} returned {} results, {} of which were new",
@@ -107,6 +103,7 @@ public class TwitterScraper {
                     newTweets);
     }
 
+    @Benchmark(limit = 10)
     void reconfigure() {
         Elective.ofNullable(getConfig())
                 .ifPresent(config -> {

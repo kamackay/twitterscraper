@@ -1,6 +1,7 @@
 package com.twitterscraper.monitors;
 
 import com.google.inject.Inject;
+import com.twitterscraper.db.DatabaseWrapper;
 import com.twitterscraper.model.Query;
 import com.twitterscraper.utils.Elective;
 import com.twitterscraper.utils.benchmark.Benchmark;
@@ -8,7 +9,6 @@ import twitter4j.Status;
 
 import java.util.ArrayList;
 
-import static com.twitterscraper.db.DatabaseWrapper.db;
 import static com.twitterscraper.twitter.TwitterWrapper.twitter;
 
 /**
@@ -17,8 +17,8 @@ import static com.twitterscraper.twitter.TwitterWrapper.twitter;
 public class UpdateMonitor extends AbstractMonitor {
 
     @Inject
-    public UpdateMonitor() {
-        super();
+    public UpdateMonitor(final DatabaseWrapper db) {
+        super(db);
     }
 
     @Override
@@ -28,12 +28,12 @@ public class UpdateMonitor extends AbstractMonitor {
                 .forEach(this::handleQuery);
     }
 
-    @Benchmark(paramName = true)
+    @Benchmark(paramName = true, limit = 1000)
     void handleQuery(final String name) {
-        final long id = db().getMostRetweets(name);
+        final long id = db.getMostRetweets(name);
         final Elective<Status> safeTweet = twitter().getTweetSafe(id);
         safeTweet.ifPresent(tweet -> {
-            db().upsert(tweet, name);
+            db.upsert(tweet, name);
             logger.info("Updated ID {} for Query {}",
                     id, name);
         });
