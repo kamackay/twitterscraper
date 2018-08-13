@@ -1,7 +1,6 @@
 package com.twitterscraper;
 
 import com.google.inject.Guice;
-import com.twitterscraper.utils.benchmark.MainModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

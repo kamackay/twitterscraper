@@ -12,4 +12,6 @@ public @interface Benchmark {
      * @return Whether to get the first parameter as a String and append to the Benchmark name
      */
     boolean paramName() default false;
+
+    long limit() default 0;
 }
