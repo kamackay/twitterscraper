@@ -2,10 +2,10 @@ package com.twitterscraper;
 
 import com.google.gson.Gson;
 import com.google.inject.Inject;
-import com.twitterscraper.db.DatabaseWrapper;
 import com.twitterscraper.model.Config;
 import com.twitterscraper.model.Query;
 import com.twitterscraper.monitors.AbstractMonitor;
+import com.twitterscraper.monitors.UpdateMonitor;
 import com.twitterscraper.utils.Elective;
 import com.twitterscraper.utils.benchmark.Benchmark;
 import org.slf4j.LoggerFactory;
@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.twitterscraper.db.DatabaseWrapper.db;
 import static com.twitterscraper.db.Transforms.millisToReadableTime;
 import static com.twitterscraper.twitter.TwitterWrapper.getWaitTimeForQueries;
 import static com.twitterscraper.twitter.TwitterWrapper.twitter;
@@ -31,16 +32,15 @@ public class TwitterScraper {
     private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
     private final List<com.twitterscraper.model.Query> queries;
 
-    private final DatabaseWrapper db;
     private final Set<AbstractMonitor> monitors;
+    private final UpdateMonitor updateMonitor;
 
     @Inject
-    TwitterScraper(final DatabaseWrapper db) {
-        this.db = db;
+    TwitterScraper(final UpdateMonitor updateMonitor) {
+        this.updateMonitor = updateMonitor;
         queries = new ArrayList<>();
         monitors = new HashSet<>();
-        //monitors.addAll(Sets.newHashSet(new UpdateMonitor(db)));
-        setQueries();
+        reconfigure();
     }
 
     /**
@@ -49,7 +49,6 @@ public class TwitterScraper {
     void start() {
         new Thread(this::run)
                 .start();
-        monitors.forEach(AbstractMonitor::start);
     }
 
     // TODO set this up in it's own Monitor
@@ -58,19 +57,20 @@ public class TwitterScraper {
             while (true) {
                 timer().setLogLimit(100)
                         .start(data("SetQueries", 10));
-                setQueries();
+                reconfigure();
                 timer().end("SetQueries")
                         .start("ResetLimitMap");
                 timer().end("ResetLimitMap");
+                queries.parallelStream().forEach(query -> handleQuery(query.getName(), query));
+                monitors.forEach(AbstractMonitor::run);
+
                 try {
                     final long ms = getWaitTimeForQueries(queries.size());
                     logger.info("Waiting for {} to span out API requests", millisToReadableTime(ms));
-                    //Thread.sleep(ms);
+                    Thread.sleep(ms);
                 } catch (Exception e) {
                     logger.error("Error spacing out API Requests", e);
-                    continue;
                 }
-                queries.parallelStream().forEach(query -> handleQuery(query.getName(), query));
             }
         } catch (Exception e) {
             logger.error("Exception running TwitterScraper", e);
@@ -80,9 +80,9 @@ public class TwitterScraper {
     @Benchmark(paramName = true)
     void handleQuery(final String queryName, final Query query) {
         try {
-            db.verifyIndex(queryName);
+            db().verifyIndex(queryName);
             if (!query.getModel().getUpdateExisting())
-                query.getQuery().sinceId(db.getMostRecent(queryName));
+                query.getQuery().sinceId(db().getMostRecent(queryName));
 
             final Elective<QueryResult> safeResult = twitter().searchSafe(query.getQuery());
             if (!safeResult.isPresent()) {
@@ -98,7 +98,7 @@ public class TwitterScraper {
     private void handleResult(final QueryResult result, final String queryName) {
         final List<Status> tweets = result.getTweets();
         final long newTweets = tweets.parallelStream()
-                .filter(tweet -> db.upsert(tweet, queryName))
+                .filter(tweet -> db().upsert(tweet, queryName))
                 .count();
         if (newTweets > 0)
             logger.info("Query {} returned {} results, {} of which were new",
@@ -107,9 +107,13 @@ public class TwitterScraper {
                     newTweets);
     }
 
-    void setQueries() {
+    void reconfigure() {
         Elective.ofNullable(getConfig())
-                .ifPresent(config -> setQueryList(config.convertQueries()))
+                .ifPresent(config -> {
+                    monitors.remove(updateMonitor);
+                    if (config.runUpdater) monitors.add(updateMonitor);
+                    setQueryList(config.convertQueries());
+                })
                 .orElse(() -> logger.error("Could not load config"));
     }
 

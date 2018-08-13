@@ -9,6 +9,7 @@ import static java.util.stream.Collectors.toList;
 public class Config {
 
     public List<QueryModel> queries;
+    public boolean runUpdater;
 
     public List<Query> convertQueries() {
         return queries.stream()

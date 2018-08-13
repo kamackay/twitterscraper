@@ -21,16 +21,20 @@ public class TwitterWrapper {
 
     private static TwitterWrapper instance = null;
 
-    private int queryCount;
+    private int queryCount = 4;
     private final Twitter twitter;
     private final Map<String, RateLimitStatus> limitMap;
     private final Semaphore sem = new Semaphore(1, true);
 
-    private TwitterWrapper(final int queryCount) {
+    private TwitterWrapper() {
         twitter = getTwitter();
         limitMap = Maps.newHashMap();
-        this.queryCount = queryCount;
         init();
+    }
+
+    protected TwitterWrapper setQueryCount(final int queryCount) {
+        this.queryCount = queryCount;
+        return this;
     }
 
     private void init() {
@@ -40,10 +44,16 @@ public class TwitterWrapper {
 
     public static TwitterWrapper twitter() {
         if (instance == null) {
-            instance = new TwitterWrapper(4);
+            instance = new TwitterWrapper();
         }
-
         return instance;
+    }
+
+    public static TwitterWrapper twitter(final int queryCount) {
+        if (instance == null) {
+            instance = new TwitterWrapper();
+        }
+        return instance.setQueryCount(queryCount);
     }
 
     /**
@@ -96,11 +106,14 @@ public class TwitterWrapper {
 
     private void resetLimitMap(final boolean wait) {
         try {
-            if (wait) waitOnLimitSafe(RATE_LIMIT_STATUS, 5);
-            sem.acquire();
-            limitMap.putAll(twitter.getRateLimitStatus());
-        } catch (TwitterException e) {
-            logger.error("Error Resetting Limit Map", e);
+            try {
+                if (wait) waitOnLimitSafe(RATE_LIMIT_STATUS, 5);
+                sem.acquire();
+                limitMap.putAll(twitter.getRateLimitStatus());
+            } catch (TwitterException e) {
+                logger.error("Error Resetting Limit Map", e);
+                Thread.sleep(60000); // Don't try again for 1 minute
+            }
         } catch (InterruptedException e) {
             logger.error("Error Acquiring semaphore", e);
         } finally {

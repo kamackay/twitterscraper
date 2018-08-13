@@ -25,5 +25,6 @@
 			"quotes": ["I Love"],
 			"updateExisting": false
 		}
-	]
+	],
+	"runUpdater": true
 }

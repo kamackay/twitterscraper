@@ -1,12 +1,14 @@
 package com.twitterscraper.monitors;
 
-import com.twitterscraper.db.DatabaseWrapper;
+import com.google.inject.Inject;
 import com.twitterscraper.model.Query;
 import com.twitterscraper.utils.Elective;
+import com.twitterscraper.utils.benchmark.Benchmark;
 import twitter4j.Status;
 
 import java.util.ArrayList;
 
+import static com.twitterscraper.db.DatabaseWrapper.db;
 import static com.twitterscraper.twitter.TwitterWrapper.twitter;
 
 /**
@@ -14,28 +16,26 @@ import static com.twitterscraper.twitter.TwitterWrapper.twitter;
  */
 public class UpdateMonitor extends AbstractMonitor {
 
-    public UpdateMonitor(
-            final DatabaseWrapper db) {
-        super(db);
+    @Inject
+    public UpdateMonitor() {
+        super();
     }
 
     @Override
-    void run() {
-        new ArrayList<>(queries).forEach(this::handleQuery);
+    public void run() {
+        new ArrayList<>(queries).parallelStream()
+                .map(Query::getName)
+                .forEach(this::handleQuery);
     }
 
-    private void handleQuery(final Query query) {
-        final long id = db.getMostRetweets(query.getName());
+    @Benchmark(paramName = true)
+    void handleQuery(final String name) {
+        final long id = db().getMostRetweets(name);
         final Elective<Status> safeTweet = twitter().getTweetSafe(id);
         safeTweet.ifPresent(tweet -> {
-            db.upsert(tweet, query.getName());
+            db().upsert(tweet, name);
             logger.info("Updated ID {} for Query {}",
-                    id, query.getName());
+                    id, name);
         });
-    }
-
-    @Override
-    int getFrequency() {
-        return 1;
     }
 }
