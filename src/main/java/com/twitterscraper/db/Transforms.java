@@ -1,5 +1,6 @@
 package com.twitterscraper.db;
 
+import com.twitterscraper.utils.StringMaker;
 import com.twitterscraper.utils.TweetPrinter;
 import org.bson.Document;
 import twitter4j.*;
@@ -12,13 +13,15 @@ import static java.util.stream.Collectors.toList;
 public class Transforms {
 
     static final String ID = "id";
+    static final String RETWEET_COUNT = "retweetCount";
+    static final String FAVORITE_COUNT = "favoriteCount";
 
     static Document convert(final Status tweet) {
         final Document document = new Document(ID, tweet.getId())
                 .append("text", tweet.getText())
-                .append("retweetCount", tweet.getRetweetCount())
+                .append(RETWEET_COUNT, tweet.getRetweetCount())
                 .append("createdAt", tweet.getCreatedAt())
-                .append("favoriteCount", tweet.getFavoriteCount())
+                .append(FAVORITE_COUNT, tweet.getFavoriteCount())
                 .append("lang", tweet.getLang())
                 .append("inReplyToUserId", tweet.getInReplyToUserId())
                 .append("inReplyToScreenName", tweet.getInReplyToScreenName())
@@ -116,16 +119,17 @@ public class Transforms {
     private final static long SECOND = 1000;
 
     public static String millisToReadableTime(long millis) {
-        final StringBuilder builder = new StringBuilder();
-        millis = readableTimeHelper(millis, DAY, "days", builder);
-        millis = readableTimeHelper(millis, HOUR, "hours", builder);
-        millis = readableTimeHelper(millis, MINUTE, "minutes", builder);
-        millis = readableTimeHelper(millis, SECOND, "seconds", builder);
-        readableTimeHelper(millis, 1, "ms", builder);
-        return builder.toString().trim();
+        final StringMaker maker = new StringMaker();
+        millis = readableTimeHelper(millis, DAY, "days", maker);
+        millis = readableTimeHelper(millis, HOUR, "hours", maker);
+        millis = readableTimeHelper(millis, MINUTE, "minutes", maker);
+        millis = readableTimeHelper(millis, SECOND, "seconds", maker);
+        readableTimeHelper(millis, 1, "ms", maker);
+        if (maker.isEmpty()) return "0 ms";
+        return maker.toString().trim();
     }
 
-    private static long readableTimeHelper(long time, long unit, String unitName, StringBuilder builder) {
+    private static long readableTimeHelper(long time, long unit, String unitName, StringMaker builder) {
         if (time >= unit) {
             builder.append(String.format("%d %s ", time / unit, unitName));
             return time % unit;

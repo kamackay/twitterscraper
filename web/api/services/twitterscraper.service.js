@@ -5,6 +5,10 @@ _this = this;
 
 exports.getTweets = async function(collection, query, page, limit) {
 	// Options setup for the mongoose paginate
+
+	// Be safe, make limit a maximum of 1000
+	limit = Math.min(limit, 1000);
+
 	var options = {
 		page,
 		limit
@@ -14,7 +18,18 @@ exports.getTweets = async function(collection, query, page, limit) {
 
 	try {
 		var tweets = await twitter.get(collection).paginate(query, options);
+		return tweets;
+	} catch (e) {
+		console.log(e);
+		// return a Error message describing the reason
+		throw Error("Error while Paginating Tweets");
+	}
+};
 
+exports.countTweets = async function(collection) {
+	try {
+		var tweets = await twitter.get(collection).countDocuments();
+		console.log('Collection "' + collection + '" has ' + tweets + " documents");
 		return tweets;
 	} catch (e) {
 		console.log(e);

@@ -1,5 +1,6 @@
-package com.twitterscraper.utils;
+package com.twitterscraper.utils.benchmark;
 
+import com.twitterscraper.utils.Elective;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.twitterscraper.db.Transforms.millisToReadableTime;
-import static com.twitterscraper.utils.BenchmarkData.data;
+import static com.twitterscraper.utils.benchmark.BenchmarkData.data;
 
 /**
  * Debugging class to quickly log time that code execution takes
@@ -64,14 +65,16 @@ public class BenchmarkTimer {
      * @return - this object, for the builder pattern
      */
     public BenchmarkTimer end(final String benchmarkName) {
-        final Elective<BenchmarkData> data = get(benchmarkName);
-        final long time = System.currentTimeMillis() -
-                data.map(BenchmarkData::getStartTime).orElse(0L);
-        if (time > data.map(BenchmarkData::getLimit).orElse(limit)) {
-            logger.info(String.format("Benchmark \"%s\" completed in %s",
-                    benchmarkName,
-                    millisToReadableTime(time)));
-        }
+        final Elective<BenchmarkData> dataElective = get(benchmarkName);
+        dataElective.ifPresent(data -> {
+            final long time = System.currentTimeMillis() - data.getStartTime();
+            if (time > data.getLimit() || data.getLogAbsolute()) {
+                logger.warn("Benchmark \"{}\" completed in {}",
+                        benchmarkName,
+                        millisToReadableTime(time));
+            }
+        }).orElse(() -> logger.warn("Call to end Benchmark \"{}\" without initializing first",
+                benchmarkName));
         return this;
     }
 

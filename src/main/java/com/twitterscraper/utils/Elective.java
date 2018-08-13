@@ -2,7 +2,6 @@ package com.twitterscraper.utils;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -315,8 +314,8 @@ public class Elective<T> {
             this.run = run;
         }
 
-        public void orElse(Callable r) throws Exception {
-            if (run) r.call();
+        public void orElse(Runnable r) {
+            if (run) r.run();
         }
     }
 }

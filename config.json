@@ -3,12 +3,12 @@
 		{
 			"queryName": "TrumpMentions",
 			"mentions": ["realDonaldTrump"],
-			"updateExisting": true
+			"updateExisting": false
 		},
 		{
-			"queryName": "ElonMuskMentions",
-			"mentions": ["elonmusk"],
-			"updateExisting": true
+			"queryName": "OcasioMentions",
+			"mentions": ["Ocasio2018"],
+			"updateExisting": false
 		},
 		{
 			"queryName": "#maga",
@@ -19,6 +19,12 @@
 			"queryName": "ObamaMentions",
 			"mentions": ["BarackObama"],
 			"updateExisting": true
+		},
+		{
+			"queryName": "QuoteILove",
+			"quotes": ["I Love"],
+			"updateExisting": false
 		}
-	]
+	],
+	"runUpdater": true
 }

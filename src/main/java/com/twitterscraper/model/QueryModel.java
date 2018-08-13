@@ -8,7 +8,7 @@ public class QueryModel {
     public List<String> hashtags;
     public boolean includeRetweets;
     public String queryName;
-    public boolean updateExisting = false;
+    public boolean updateExisting = true;
 
     public String getQueryName() {
         return queryName;

@@ -8,20 +8,25 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.UpdateOptions;
 import com.sun.istack.internal.NotNull;
+import com.twitterscraper.utils.Elective;
+import com.twitterscraper.utils.benchmark.Benchmark;
 import org.bson.Document;
 import twitter4j.Status;
 
 import java.util.Arrays;
-import java.util.Optional;
 
 import static com.mongodb.client.model.Filters.eq;
-import static com.twitterscraper.db.Transforms.ID;
-import static com.twitterscraper.db.Transforms.convert;
+import static com.twitterscraper.db.Transforms.*;
 
 public class DatabaseWrapper {
+
+    private static final long DEFAULT_LONG = -1;
+
     private final MongoDatabase db;
 
-    public DatabaseWrapper() {
+    private static DatabaseWrapper instance = null;
+
+    private DatabaseWrapper() {
         MongoClient client = MongoClients.create(MongoClientSettings.builder()
                 .applyToClusterSettings(builder ->
                         builder.hosts(Arrays.asList(
@@ -29,6 +34,13 @@ public class DatabaseWrapper {
                         )))
                 .build());
         db = client.getDatabase("TwitterScraper");
+    }
+
+    public static DatabaseWrapper db() {
+        if (instance == null) {
+            instance = new DatabaseWrapper();
+        }
+        return instance;
     }
 
     /**
@@ -66,11 +78,21 @@ public class DatabaseWrapper {
      * @return - The ID of the most recent tweet in this collection
      */
     public long getMostRecent(@NotNull final String collectionName) {
-        return Optional.ofNullable(db.getCollection(collectionName)
+        return Elective.ofNullable(db.getCollection(collectionName)
                 .find()
                 .sort(new Document(ID, -1))
                 .first())
                 .map(d -> d.getLong(ID))
-                .orElse(-1L);
+                .orElse(DEFAULT_LONG);
+    }
+
+    @Benchmark(paramName = true)
+    public long getMostRetweets(@NotNull final String collectionName) {
+        return Elective.ofNullable(db.getCollection(collectionName)
+                .find()
+                .sort(new Document(RETWEET_COUNT, -1))
+                .first())
+                .map(d -> d.getLong(ID))
+                .orElse(DEFAULT_LONG);
     }
 }

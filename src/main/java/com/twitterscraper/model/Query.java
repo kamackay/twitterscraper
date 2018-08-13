@@ -1,6 +1,8 @@
 package com.twitterscraper.model;
 
-public class Query {
+import com.twitterscraper.utils.Elective;
+
+public class Query implements ICloneable<Query> {
     private twitter4j.Query query;
     private QueryModel model;
 
@@ -25,5 +27,17 @@ public class Query {
     public Query setModel(QueryModel model) {
         this.model = model;
         return this;
+    }
+
+    public String getName() {
+        return Elective.of(model)
+                .map(QueryModel::getQueryName)
+                .orElse(null);
+    }
+
+    @Override
+    public Query copy() {
+        return new Query(new twitter4j.Query(query.getQuery()),
+                model);
     }
 }
