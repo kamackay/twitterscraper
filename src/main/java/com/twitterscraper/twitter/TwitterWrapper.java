@@ -17,7 +17,7 @@ import static com.twitterscraper.twitter.RateLimit.*;
 
 public class TwitterWrapper {
 
-    private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
+    private org.slf4j.Logger logger = LoggerFactory.getLogger(TwitterWrapper.class);
 
     private static TwitterWrapper instance = null;
 

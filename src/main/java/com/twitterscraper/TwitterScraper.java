@@ -27,7 +27,7 @@ import static com.twitterscraper.twitter.TwitterWrapper.twitter;
 
 public class TwitterScraper {
 
-    private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
+    private org.slf4j.Logger logger = LoggerFactory.getLogger(TwitterScraper.class);
     private final List<com.twitterscraper.model.Query> queries;
 
     private final Set<AbstractMonitor> monitors;

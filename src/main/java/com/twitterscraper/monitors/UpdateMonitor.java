@@ -5,6 +5,8 @@ import com.twitterscraper.db.DatabaseWrapper;
 import com.twitterscraper.model.Query;
 import com.twitterscraper.utils.Elective;
 import com.twitterscraper.utils.benchmark.Benchmark;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import twitter4j.Status;
 
 import java.util.ArrayList;
@@ -15,6 +17,8 @@ import static com.twitterscraper.twitter.TwitterWrapper.twitter;
  * This is more of an example of a monitor, and not actually all that useful
  */
 public class UpdateMonitor extends AbstractMonitor {
+
+    protected final Logger logger = LoggerFactory.getLogger(UpdateMonitor.class);
 
     @Inject
     public UpdateMonitor(final DatabaseWrapper db) {
