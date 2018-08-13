@@ -3,7 +3,7 @@
 		{
 			"queryName": "TrumpMentions",
 			"mentions": ["realDonaldTrump"],
-			"updateExisting": true
+			"updateExisting": false
 		},
 		{
 			"queryName": "OcasioMentions",
@@ -19,6 +19,11 @@
 			"queryName": "ObamaMentions",
 			"mentions": ["BarackObama"],
 			"updateExisting": true
+		},
+		{
+			"queryName": "QuoteILove",
+			"quotes": ["I Love"],
+			"updateExisting": false
 		}
 	]
 }

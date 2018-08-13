@@ -1,5 +1,6 @@
 package com.twitterscraper.db;
 
+import com.google.inject.Inject;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClient;
@@ -8,7 +9,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.UpdateOptions;
 import com.sun.istack.internal.NotNull;
-import com.twitterscraper.utils.Benchmark;
+import com.twitterscraper.utils.benchmark.Benchmark;
 import com.twitterscraper.utils.Elective;
 import org.bson.Document;
 import twitter4j.Status;
@@ -21,6 +22,7 @@ import static com.twitterscraper.db.Transforms.*;
 public class DatabaseWrapper {
     private final MongoDatabase db;
 
+    @Inject
     public DatabaseWrapper() {
         MongoClient client = MongoClients.create(MongoClientSettings.builder()
                 .applyToClusterSettings(builder ->

@@ -1,11 +1,13 @@
 package com.twitterscraper;
 
 import com.google.gson.Gson;
+import com.google.inject.Inject;
 import com.twitterscraper.db.DatabaseWrapper;
 import com.twitterscraper.model.Config;
 import com.twitterscraper.model.Query;
 import com.twitterscraper.monitors.AbstractMonitor;
 import com.twitterscraper.utils.Elective;
+import com.twitterscraper.utils.benchmark.Benchmark;
 import org.slf4j.LoggerFactory;
 import twitter4j.QueryResult;
 import twitter4j.Status;
@@ -18,12 +20,13 @@ import java.util.List;
 import java.util.Set;
 
 import static com.twitterscraper.db.Transforms.millisToReadableTime;
+import static com.twitterscraper.twitter.TwitterWrapper.getWaitTimeForQueries;
 import static com.twitterscraper.twitter.TwitterWrapper.twitter;
 import static com.twitterscraper.utils.benchmark.BenchmarkData.data;
 import static com.twitterscraper.utils.benchmark.BenchmarkTimer.timer;
 
 
-class TwitterScraper {
+public class TwitterScraper {
 
     private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
     private final List<com.twitterscraper.model.Query> queries;
@@ -31,9 +34,10 @@ class TwitterScraper {
     private final DatabaseWrapper db;
     private final Set<AbstractMonitor> monitors;
 
-    TwitterScraper() {
+    @Inject
+    TwitterScraper(final DatabaseWrapper db) {
+        this.db = db;
         queries = new ArrayList<>();
-        db = new DatabaseWrapper();
         monitors = new HashSet<>();
         //monitors.addAll(Sets.newHashSet(new UpdateMonitor(db)));
         setQueries();
@@ -59,23 +63,22 @@ class TwitterScraper {
                         .start("ResetLimitMap");
                 timer().end("ResetLimitMap");
                 try {
-                    final long ms = Math.min((int) Math.pow(queries.size(), 2), 60) * 1000;
+                    final long ms = getWaitTimeForQueries(queries.size());
                     logger.info("Waiting for {} to span out API requests", millisToReadableTime(ms));
-                    Thread.sleep(ms);
-                } catch (InterruptedException e) {
+                    //Thread.sleep(ms);
+                } catch (Exception e) {
                     logger.error("Error spacing out API Requests", e);
                     continue;
                 }
-                queries.forEach(this::handleQuery);
+                queries.parallelStream().forEach(query -> handleQuery(query.getName(), query));
             }
         } catch (Exception e) {
             logger.error("Exception running TwitterScraper", e);
         }
     }
 
-    private void handleQuery(final Query query) {
-        final String queryName = query.getModel().getQueryName();
-        timer().start(data("QueryHandle." + queryName, 500));
+    @Benchmark(paramName = true)
+    void handleQuery(final String queryName, final Query query) {
         try {
             db.verifyIndex(queryName);
             if (!query.getModel().getUpdateExisting())
@@ -89,8 +92,6 @@ class TwitterScraper {
             safeResult.ifPresent(result -> this.handleResult(result, queryName));
         } catch (Exception e) {
             logger.error("Error handling query " + queryName, e);
-        } finally {
-            timer().end("QueryHandle." + queryName);
         }
     }
 
@@ -106,13 +107,13 @@ class TwitterScraper {
                     newTweets);
     }
 
-    private void setQueries() {
+    void setQueries() {
         Elective.ofNullable(getConfig())
                 .ifPresent(config -> setQueryList(config.convertQueries()))
                 .orElse(() -> logger.error("Could not load config"));
     }
 
-    private TwitterScraper setQueryList(final List<com.twitterscraper.model.Query> queries) {
+    TwitterScraper setQueryList(final List<com.twitterscraper.model.Query> queries) {
         this.queries.clear();
         this.queries.addAll(queries);
         monitors.forEach(abstractMonitor ->
