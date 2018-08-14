@@ -14,15 +14,13 @@ import twitter4j.Status;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Projections.excludeId;
-import static com.mongodb.client.model.Projections.fields;
-import static com.mongodb.client.model.Projections.include;
+import static com.mongodb.client.model.Projections.*;
 import static com.twitterscraper.db.Transforms.*;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 
 public class DatabaseWrapperImpl implements DatabaseWrapper {
 
@@ -100,13 +98,13 @@ public class DatabaseWrapperImpl implements DatabaseWrapper {
     public List<Long> getAllIds(final String collectionName) {
         return Elective.ofNullable(db.getCollection(collectionName))
                 .map(MongoCollection::find)
-                .map(documents -> documents.projection(fields(include(ID), excludeId())))
+                .map(d -> d.projection(fields(include(ID), excludeId())))
                 .map(d -> d.sort(new Document(ID, 1)))
                 .map(d -> d.into(new ArrayList<>()))
                 .map(d -> d.stream()
-                        .map(document -> document.getLong(ID))
-                        .collect(Collectors.toList()))
-                .orElse(Collections.emptyList());
+                        .map(doc -> doc.getLong(ID))
+                        .collect(toList()))
+                .orElse(emptyList());
     }
 
     @Override
