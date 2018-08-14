@@ -1,6 +1,6 @@
 twitter4j.properties
 target/*
-output.log
+TwitterScraper.log
 tweets.json
 .idea/*
 .vscode/*

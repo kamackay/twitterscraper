@@ -94,12 +94,16 @@ public class DatabaseWrapperImpl implements DatabaseWrapper {
                 .orElse(DEFAULT_LONG);
     }
 
-    @Benchmark(paramName = true, limit = 500)
     public List<Long> getAllIds(final String collectionName) {
+        return getAllIds(collectionName, true);
+    }
+
+    @Benchmark(paramName = true, limit = 500)
+    public List<Long> getAllIds(final String collectionName, final boolean sort) {
         return Elective.ofNullable(db.getCollection(collectionName))
                 .map(MongoCollection::find)
                 .map(d -> d.projection(fields(include(ID), excludeId())))
-                .map(d -> d.sort(new Document(ID, 1)))
+                .map(d -> sort ? d.sort(new Document(ID, 1)) : d)
                 .map(d -> d.into(new ArrayList<>()))
                 .map(d -> d.stream()
                         .map(doc -> doc.getLong(ID))

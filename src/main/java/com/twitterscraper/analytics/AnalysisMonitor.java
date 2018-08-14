@@ -34,7 +34,7 @@ public class AnalysisMonitor extends AbstractMonitor {
 
     protected void handleQuery(final String name) {
         final long startTime = System.currentTimeMillis();
-        for (long id : db.getAllIds(name)) {
+        for (long id : db.getAllIds(name, true)) {
             // Stop this if it has been running too long
             if (System.currentTimeMillis() - startTime > ALLOWED_TIME) break;
             db.getById(name, id).ifPresent(this::analyzeTweet);

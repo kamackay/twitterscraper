@@ -18,4 +18,6 @@ public interface DatabaseWrapper {
     List<Long> getAllIds(final String collectionName);
 
     Elective<Document> getById(final String collectionName, final long id);
+
+    List<Long> getAllIds(final String name, final boolean b);
 }

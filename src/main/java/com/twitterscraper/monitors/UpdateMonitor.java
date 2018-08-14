@@ -25,7 +25,7 @@ public class UpdateMonitor extends AbstractMonitor {
     }
 
     protected void handleQuery(final String name) {
-        List<Long> ids = db.getAllIds(name);
+        List<Long> ids = db.getAllIds(name, false);
         final long id = ids.get(new Random().nextInt(ids.size()));
         final Elective<Status> safeTweet = twitter().getTweetSafe(id);
         safeTweet.ifPresent(tweet -> {
