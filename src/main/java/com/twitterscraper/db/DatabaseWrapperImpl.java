@@ -3,10 +3,9 @@ package com.twitterscraper.db;
 import com.google.inject.Inject;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.ServerAddress;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.*;
 import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.UpdateOptions;
 import com.sun.istack.internal.NotNull;
 import com.twitterscraper.utils.Elective;
@@ -14,7 +13,11 @@ import com.twitterscraper.utils.benchmark.Benchmark;
 import org.bson.Document;
 import twitter4j.Status;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.twitterscraper.db.Transforms.*;
@@ -37,13 +40,6 @@ public class DatabaseWrapperImpl implements DatabaseWrapper {
                 .build());
         db = client.getDatabase("TwitterScraper");
     }
-
-//    public static DatabaseWrapper db() {
-//        if (instance == null) {
-//            instance = new DatabaseWrapper();
-//        }
-//        return instance;
-//    }
 
     /**
      * Upsert (Update or Insert) this tweet into the mongo collection provided
@@ -96,5 +92,27 @@ public class DatabaseWrapperImpl implements DatabaseWrapper {
                 .first())
                 .map(d -> d.getLong(ID))
                 .orElse(DEFAULT_LONG);
+    }
+
+    @Benchmark(paramName = true, limit = 500)
+    public List<Long> getAllIds(final String collectionName) {
+        return Elective.ofNullable(db.getCollection(collectionName))
+                .map(MongoCollection::find)
+                .map(d -> d.sort(new Document(ID, 1)))
+                .map(documents -> documents.projection(Projections.fields(Projections.include(ID))))
+                .map(d -> d.into(new ArrayList<>()))
+                .map(d -> d.stream()
+                        .map(document -> document.getLong(ID))
+                        .collect(Collectors.toList()))
+                .orElse(Collections.emptyList());
+    }
+
+    @Override
+    @Benchmark(paramName = true, limit = 10)
+    public Elective<Document> getById(final String collectionName, final long id) {
+        return Elective.ofNullable(db.getCollection(collectionName))
+                .map(MongoCollection::find)
+                .map(d -> d.filter(new Document(ID, id)))
+                .map(FindIterable::first);
     }
 }

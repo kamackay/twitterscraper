@@ -6,18 +6,8 @@
 			"updateExisting": false
 		},
 		{
-			"queryName": "OcasioMentions",
-			"mentions": ["Ocasio2018"],
-			"updateExisting": false
-		},
-		{
-			"queryName": "#maga",
-			"hashtags": ["maga"],
-			"updateExisting": true
-		},
-		{
-			"queryName": "ObamaMentions",
-			"mentions": ["BarackObama"],
+			"queryName": "AbortionQuotes",
+			"quotes": ["Abortion"],
 			"updateExisting": true
 		},
 		{
@@ -26,5 +16,6 @@
 			"updateExisting": false
 		}
 	],
-	"runUpdater": true
+	"runUpdater": true,
+	"runAnalysis": true
 }

@@ -2,14 +2,13 @@ package com.twitterscraper.monitors;
 
 import com.google.inject.Inject;
 import com.twitterscraper.db.DatabaseWrapper;
-import com.twitterscraper.model.Query;
 import com.twitterscraper.utils.Elective;
-import com.twitterscraper.utils.benchmark.Benchmark;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import twitter4j.Status;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import static com.twitterscraper.twitter.TwitterWrapper.twitter;
 
@@ -25,16 +24,9 @@ public class UpdateMonitor extends AbstractMonitor {
         super(db);
     }
 
-    @Override
-    public void run() {
-        new ArrayList<>(queries).parallelStream()
-                .map(Query::getName)
-                .forEach(this::handleQuery);
-    }
-
-    @Benchmark(paramName = true, limit = 1000)
-    void handleQuery(final String name) {
-        final long id = db.getMostRetweets(name);
+    protected void handleQuery(final String name) {
+        List<Long> ids = db.getAllIds(name);
+        final long id = ids.get(new Random().nextInt(ids.size()));
         final Elective<Status> safeTweet = twitter().getTweetSafe(id);
         safeTweet.ifPresent(tweet -> {
             db.upsert(tweet, name);

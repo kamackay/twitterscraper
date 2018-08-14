@@ -10,6 +10,7 @@ public class Config {
 
     public List<QueryModel> queries;
     public boolean runUpdater;
+    public boolean runAnalysis;
 
     public List<Query> convertQueries() {
         return queries.stream()

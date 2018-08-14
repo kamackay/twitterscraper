@@ -3,4 +3,5 @@ target/*
 output.log
 tweets.json
 .idea/*
+.vscode/*
 twitterscraper.iml

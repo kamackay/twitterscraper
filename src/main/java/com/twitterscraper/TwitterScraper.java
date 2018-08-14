@@ -1,7 +1,9 @@
 package com.twitterscraper;
 
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
+import com.twitterscraper.analytics.AnalysisMonitor;
 import com.twitterscraper.db.DatabaseWrapper;
 import com.twitterscraper.model.Config;
 import com.twitterscraper.model.Query;
@@ -32,12 +34,16 @@ public class TwitterScraper {
 
     private final Set<AbstractMonitor> monitors;
     private final UpdateMonitor updateMonitor;
+    private final AnalysisMonitor analysisMonitor;
     private final DatabaseWrapper db;
 
     @Inject
-    TwitterScraper(final UpdateMonitor updateMonitor,
-                   final DatabaseWrapper db) {
+    TwitterScraper(
+            final UpdateMonitor updateMonitor,
+            final AnalysisMonitor analysisMonitor,
+            final DatabaseWrapper db) {
         this.updateMonitor = updateMonitor;
+        this.analysisMonitor = analysisMonitor;
         this.db = db;
         queries = new ArrayList<>();
         monitors = new HashSet<>();
@@ -52,7 +58,7 @@ public class TwitterScraper {
                 .start();
     }
 
-    // TODO set this up in it's own Monitor
+    // TODO set this up in its own Monitor
     private void run() {
         try {
             while (true) {
@@ -107,8 +113,9 @@ public class TwitterScraper {
     void reconfigure() {
         Elective.ofNullable(getConfig())
                 .ifPresent(config -> {
-                    monitors.remove(updateMonitor);
+                    monitors.removeAll(Sets.newHashSet(updateMonitor, analysisMonitor));
                     if (config.runUpdater) monitors.add(updateMonitor);
+                    if (config.runAnalysis) monitors.add(analysisMonitor);
                     setQueryList(config.convertQueries());
                 })
                 .orElse(() -> logger.error("Could not load config"));

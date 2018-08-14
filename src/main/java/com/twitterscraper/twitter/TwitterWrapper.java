@@ -155,12 +155,12 @@ public class TwitterWrapper {
             RateLimitStatus status = limit.get();
             if (log) logger.info("Limit {} is at {}", rateLimit.getName(), status.getRemaining());
             if (status.getRemaining() <= minLimit) {
-                final long sleep = status.getSecondsUntilReset() + 1;
+                final long sleep = (status.getSecondsUntilReset() + 1) * 1000;
                 // Extra second to account for race conditions
                 logger.info("Sleeping for {} to refresh \"{}\" limit",
-                        millisToReadableTime(sleep * 1000),
+                        millisToReadableTime(sleep),
                         rateLimit.getName());
-                if (sleep >= 0) Thread.sleep(sleep * 1000);
+                if (sleep >= 0) Thread.sleep(sleep);
             }
             return true;
         } finally {
