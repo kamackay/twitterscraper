@@ -5,7 +5,6 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.*;
 import com.mongodb.client.model.IndexOptions;
-import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.UpdateOptions;
 import com.sun.istack.internal.NotNull;
 import com.twitterscraper.utils.Elective;
@@ -20,6 +19,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Projections.excludeId;
+import static com.mongodb.client.model.Projections.fields;
+import static com.mongodb.client.model.Projections.include;
 import static com.twitterscraper.db.Transforms.*;
 
 public class DatabaseWrapperImpl implements DatabaseWrapper {
@@ -98,8 +100,8 @@ public class DatabaseWrapperImpl implements DatabaseWrapper {
     public List<Long> getAllIds(final String collectionName) {
         return Elective.ofNullable(db.getCollection(collectionName))
                 .map(MongoCollection::find)
+                .map(documents -> documents.projection(fields(include(ID), excludeId())))
                 .map(d -> d.sort(new Document(ID, 1)))
-                .map(documents -> documents.projection(Projections.fields(Projections.include(ID))))
                 .map(d -> d.into(new ArrayList<>()))
                 .map(d -> d.stream()
                         .map(document -> document.getLong(ID))
