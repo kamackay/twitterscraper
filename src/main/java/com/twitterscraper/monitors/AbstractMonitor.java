@@ -1,6 +1,7 @@
 package com.twitterscraper.monitors;
 
 import com.twitterscraper.db.DatabaseWrapper;
+import com.twitterscraper.model.Config;
 import com.twitterscraper.model.Query;
 import com.twitterscraper.utils.benchmark.Benchmark;
 
@@ -12,6 +13,7 @@ public abstract class AbstractMonitor {
     volatile List<Query> queries;
 
     protected final DatabaseWrapper db;
+    protected Config config;
 
     public AbstractMonitor(final DatabaseWrapper db) {
         this.db = db;
@@ -27,6 +29,10 @@ public abstract class AbstractMonitor {
         new ArrayList<>(queries).parallelStream()
                 .map(Query::getName)
                 .forEach(this::handleQuery);
+    }
+
+    public void setConfig(final Config config) {
+        this.config = config;
     }
 
     @Benchmark(paramName = true, limit = 1000)

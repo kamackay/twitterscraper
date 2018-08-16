@@ -3,66 +3,73 @@ package com.twitterscraper.analytics;
 import com.google.inject.Inject;
 import com.twitterscraper.db.DatabaseWrapper;
 import com.twitterscraper.monitors.AbstractMonitor;
-import edu.stanford.nlp.ling.CoreAnnotations;
-import edu.stanford.nlp.neural.rnn.RNNCoreAnnotations;
-import edu.stanford.nlp.pipeline.Annotation;
-import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import edu.stanford.nlp.sentiment.SentimentCoreAnnotations;
-import edu.stanford.nlp.trees.Tree;
-import edu.stanford.nlp.util.CoreMap;
+import com.twitterscraper.utils.benchmark.Benchmark;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.twitterscraper.db.Transforms.millisToReadableTime;
+import static com.twitterscraper.utils.GeneralUtils.*;
+
 public class AnalysisMonitor extends AbstractMonitor {
+
+    private static final String ANALYSIS_NAME = "analysis";
 
     protected final Logger logger = LoggerFactory.getLogger(AnalysisMonitor.class);
 
-    private static final long ALLOWED_TIME = 10000;
-
-    private static StanfordCoreNLP pipeline;
 
     @Inject
     public AnalysisMonitor(final DatabaseWrapper db) {
         super(db);
-        try {
-            pipeline = new StanfordCoreNLP("nlp.properties");
-        } catch (Exception e) {
-            pipeline = null;
-        }
     }
 
     protected void handleQuery(final String name) {
+        final long timeToRun = config.getAnalysis().timeToRun;
+        List<Long> ids = db.getAllIds(name, true);
         final long startTime = System.currentTimeMillis();
-        for (long id : db.getAllIds(name, true)) {
+        AtomicInteger numAnalyzed = new AtomicInteger();
+        for (long id : ids) {
             // Stop this if it has been running too long
-            if (System.currentTimeMillis() - startTime > ALLOWED_TIME) break;
-            db.getById(name, id).ifPresent(this::analyzeTweet);
-            break;
+            if (System.currentTimeMillis() - startTime > timeToRun) break;
+            db.getById(name, id).ifPresent(tweet -> {
+                if (analyzeTweet(name, tweet)) numAnalyzed.getAndIncrement();
+            });
         }
+        int a = numAnalyzed.get();
+        if (a > 0) logger.info("Analyzed {} tweets for {} in {}",
+                a, name,
+                millisToReadableTime(System.currentTimeMillis() - startTime));
+
+        if (config.getAnalysis().countProgress)
+            async(() -> getPercentageAnalyzed(name, ids));
     }
 
-    private void analyzeTweet(final Document tweet) {
-
+    @Benchmark(paramName = true)
+    void getPercentageAnalyzed(final String name, final List<Long> ids) {
+        AtomicInteger numAnalyzed = new AtomicInteger();
+        for (long id : ids) {
+            db.getById(name, id).ifPresent(tweet -> {
+                if (tweet.get(ANALYSIS_NAME) != null) numAnalyzed.getAndIncrement();
+            });
+        }
+        final long count = ids.size();
+        logger.info("{} - {} analyzed of {} - {}",
+                name, numAnalyzed.get(), count,
+                toPercentString((double) numAnalyzed.get() / count));
     }
 
-    private static int getSentiment(final String tweet) {
-        if (pipeline == null) return 0;
-        int mainSentiment = 0;
-        if (tweet != null && tweet.length() > 0) {
-            int longest = 0;
-            Annotation annotation = pipeline.process(tweet);
-            for (CoreMap sentence : annotation
-                    .get(CoreAnnotations.SentencesAnnotation.class)) {
-                Tree tree = sentence.get(SentimentCoreAnnotations.SentimentAnnotatedTree.class);
-                int sentiment = RNNCoreAnnotations.getPredictedClass(tree);
-                String partText = sentence.toString();
-                if (partText.length() > longest) {
-                    mainSentiment = sentiment;
-                    longest = partText.length();
-                }
-            }
-        }
-        return mainSentiment;
+    private boolean analyzeTweet(final String name, final Document tweet) {
+        if (!needsAnalysis(tweet)) return false;
+        safeSleep(100); // TODO do analysis
+        tweet.append(ANALYSIS_NAME, new Document("time", System.currentTimeMillis()));
+        db.upsert(tweet, name);
+        return true;
+    }
+
+    private boolean needsAnalysis(final Document tweet) {
+        return tweet.get(ANALYSIS_NAME) == null;
     }
 }

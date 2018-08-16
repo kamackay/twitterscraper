@@ -10,7 +10,7 @@ public class Config {
 
     public List<QueryModel> queries;
     public boolean runUpdater;
-    public boolean runAnalysis;
+    public AnalysisConfig analysis;
 
     public List<Query> convertQueries() {
         return queries.stream()
@@ -28,4 +28,7 @@ public class Config {
                 .setIncludeRetweets(query.includeRetweets);
     }
 
+    public AnalysisConfig getAnalysis() {
+        return analysis;
+    }
 }

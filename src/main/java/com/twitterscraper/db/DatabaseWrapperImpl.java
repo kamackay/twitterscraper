@@ -56,6 +56,20 @@ public class DatabaseWrapperImpl implements DatabaseWrapper {
     }
 
     /**
+     * Upsert (Update or Insert) this tweet into the mongo collection provided
+     *
+     * @param tweet          - The tweet to add to the database
+     * @param collectionName - The collection to add the tweet to
+     * @return boolean of whether the tweet was new
+     */
+    public boolean upsert(final Document tweet, @NotNull final String collectionName) {
+        return db.getCollection(collectionName)
+                .updateOne(eq("id", tweet.getLong(ID)),
+                        new Document("$set", tweet),
+                        new UpdateOptions().upsert(true)).getMatchedCount() == 0;
+    }
+
+    /**
      * Verify that the ID column on this collection has a unique constraint
      *
      * @param collectionName - Name of the collection to add an index to
@@ -98,7 +112,7 @@ public class DatabaseWrapperImpl implements DatabaseWrapper {
         return getAllIds(collectionName, true);
     }
 
-    @Benchmark(paramName = true, limit = 500)
+    @Benchmark(logAllParams = true, limit = 500)
     public List<Long> getAllIds(final String collectionName, final boolean sort) {
         return Elective.ofNullable(db.getCollection(collectionName))
                 .map(MongoCollection::find)
@@ -111,8 +125,7 @@ public class DatabaseWrapperImpl implements DatabaseWrapper {
                 .orElse(emptyList());
     }
 
-    @Override
-    @Benchmark(paramName = true, limit = 10)
+    @Benchmark(logAllParams = true, limit = 100)
     public Elective<Document> getById(final String collectionName, final long id) {
         return Elective.ofNullable(db.getCollection(collectionName))
                 .map(MongoCollection::find)

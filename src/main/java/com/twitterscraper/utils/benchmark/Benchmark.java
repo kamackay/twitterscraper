@@ -13,5 +13,7 @@ public @interface Benchmark {
      */
     boolean paramName() default false;
 
+    boolean logAllParams() default false;
+
     long limit() default 0;
 }

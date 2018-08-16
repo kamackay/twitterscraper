@@ -115,8 +115,9 @@ public class TwitterScraper {
                 .ifPresent(config -> {
                     monitors.removeAll(Sets.newHashSet(updateMonitor, analysisMonitor));
                     if (config.runUpdater) monitors.add(updateMonitor);
-                    if (config.runAnalysis) monitors.add(analysisMonitor);
+                    if (config.getAnalysis().run) monitors.add(analysisMonitor);
                     setQueryList(config.convertQueries());
+                    monitors.forEach(monitor -> monitor.setConfig(config));
                 })
                 .orElse(() -> logger.error("Could not load config"));
     }

@@ -11,6 +11,8 @@ public interface DatabaseWrapper {
 
     boolean upsert(final Status tweet, final String name);
 
+    boolean upsert(final Document tweet, final String name);
+
     void verifyIndex(final String collectionName);
 
     long getMostRecent(final String collectionName);
