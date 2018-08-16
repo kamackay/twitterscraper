@@ -12,7 +12,7 @@ import static java.util.stream.Collectors.toList;
 
 public class Transforms {
 
-    static final String ID = "id";
+    public static final String ID = "id";
     static final String RETWEET_COUNT = "retweetCount";
     static final String FAVORITE_COUNT = "favoriteCount";
 
@@ -52,7 +52,7 @@ public class Transforms {
 
     private static Document convert(Place place) {
         if (place == null) return null;
-        return new Document("id", place.getId())
+        return new Document(ID, place.getId())
                 .append("name", place.getName())
                 .append("url", place.getURL())
                 .append("placeType", place.getPlaceType())
@@ -80,7 +80,7 @@ public class Transforms {
 
     private static Document convert(final UserMentionEntity e) {
         if (e == null) return null;
-        return new Document("id", e.getId())
+        return new Document(ID, e.getId())
                 .append("screenName", e.getScreenName())
                 .append("text", e.getText())
                 .append("start", e.getStart())
@@ -91,7 +91,7 @@ public class Transforms {
 
     private static Document convert(final MediaEntity e) {
         if (e == null) return null;
-        return new Document("id", e.getId())
+        return new Document(ID, e.getId())
                 .append("mediaURL", e.getMediaURL())
                 .append("mediaURLHttps", e.getMediaURLHttps())
                 .append("expandedULR", e.getExpandedURL())
@@ -104,7 +104,7 @@ public class Transforms {
 
     private static Document convert(final User u) {
         if (u == null) return null;
-        return new Document("id", u.getId())
+        return new Document(ID, u.getId())
                 .append("screenName", u.getScreenName())
                 .append("name", u.getName())
                 .append("createdAt", u.getCreatedAt())
@@ -120,6 +120,10 @@ public class Transforms {
 
     public static String millisToReadableTime(long millis) {
         final StringMaker maker = new StringMaker();
+        if (millis < 0) {
+            millis = Math.abs(millis);
+            maker.append("-");
+        }
         millis = readableTimeHelper(millis, DAY, "days", maker);
         millis = readableTimeHelper(millis, HOUR, "hours", maker);
         millis = readableTimeHelper(millis, MINUTE, "minutes", maker);
