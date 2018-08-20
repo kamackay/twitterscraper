@@ -8,14 +8,14 @@ import com.twitterscraper.utils.benchmark.Benchmark;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractMonitor {
+public abstract class AbstractService {
 
     volatile List<Query> queries;
 
     protected final DatabaseWrapper db;
     protected Config config;
 
-    public AbstractMonitor(final DatabaseWrapper db) {
+    public AbstractService(final DatabaseWrapper db) {
         this.db = db;
         queries = new ArrayList<>();
     }

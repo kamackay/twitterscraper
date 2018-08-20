@@ -15,12 +15,12 @@ import static com.twitterscraper.twitter.TwitterWrapper.twitter;
 /**
  * This is more of an example of a monitor, and not actually all that useful
  */
-public class UpdateMonitor extends AbstractMonitor {
+public class UpdateService extends AbstractService {
 
-    protected final Logger logger = LoggerFactory.getLogger(UpdateMonitor.class);
+    protected final Logger logger = LoggerFactory.getLogger(UpdateService.class);
 
     @Inject
-    public UpdateMonitor(final DatabaseWrapper db) {
+    public UpdateService(final DatabaseWrapper db) {
         super(db);
     }
 

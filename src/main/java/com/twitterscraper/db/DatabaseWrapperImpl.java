@@ -125,6 +125,19 @@ public class DatabaseWrapperImpl implements DatabaseWrapper {
                 .orElse(emptyList());
     }
 
+    @Benchmark(paramName = true)
+    public List<Long> getTweetsToAnalyze(final String name) {
+        return Elective.ofNullable(db.getCollection(name))
+                .map(MongoCollection::find)
+                .map(d -> d.filter(new Document(ANALYSIS, new Document("$exists", false))))
+                .map(d -> d.projection(fields(include(ID), excludeId())))
+                .map(d -> d.into(new ArrayList<>()))
+                .map(d -> d.stream()
+                        .map(doc -> doc.getLong(ID))
+                        .collect(toList()))
+                .orElse(emptyList());
+    }
+
     @Benchmark(logAllParams = true, limit = 100)
     public Elective<Document> getById(final String collectionName, final long id) {
         return Elective.ofNullable(db.getCollection(collectionName))

@@ -18,8 +18,8 @@
 	],
 	"runUpdater": true,
 	"analysis": {
-		"run": true,
-		"timeToRun": 20000,
-		"countProgress": false
+		"run": false,
+		"timeToRun": 30000,
+		"countProgress": true
 	}
 }

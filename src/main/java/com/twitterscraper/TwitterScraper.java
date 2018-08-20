@@ -3,12 +3,12 @@ package com.twitterscraper;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
-import com.twitterscraper.analytics.AnalysisMonitor;
+import com.twitterscraper.analytics.AnalysisService;
 import com.twitterscraper.db.DatabaseWrapper;
 import com.twitterscraper.model.Config;
 import com.twitterscraper.model.Query;
-import com.twitterscraper.monitors.AbstractMonitor;
-import com.twitterscraper.monitors.UpdateMonitor;
+import com.twitterscraper.monitors.AbstractService;
+import com.twitterscraper.monitors.UpdateService;
 import com.twitterscraper.utils.Elective;
 import com.twitterscraper.utils.benchmark.Benchmark;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.twitterscraper.db.Transforms.millisToReadableTime;
 import static com.twitterscraper.twitter.TwitterWrapper.getWaitTimeForQueries;
 import static com.twitterscraper.twitter.TwitterWrapper.twitter;
 
@@ -32,21 +31,21 @@ public class TwitterScraper {
     private org.slf4j.Logger logger = LoggerFactory.getLogger(TwitterScraper.class);
     private final List<com.twitterscraper.model.Query> queries;
 
-    private final Set<AbstractMonitor> monitors;
-    private final UpdateMonitor updateMonitor;
-    private final AnalysisMonitor analysisMonitor;
+    private final Set<AbstractService> services;
+    private final UpdateService updateService;
+    private final AnalysisService analysisService;
     private final DatabaseWrapper db;
 
     @Inject
     TwitterScraper(
-            final UpdateMonitor updateMonitor,
-            final AnalysisMonitor analysisMonitor,
+            final UpdateService updateService,
+            final AnalysisService analysisService,
             final DatabaseWrapper db) {
-        this.updateMonitor = updateMonitor;
-        this.analysisMonitor = analysisMonitor;
+        this.updateService = updateService;
+        this.analysisService = analysisService;
         this.db = db;
         queries = new ArrayList<>();
-        monitors = new HashSet<>();
+        services = new HashSet<>();
         reconfigure();
     }
 
@@ -64,12 +63,12 @@ public class TwitterScraper {
             while (true) {
                 reconfigure();
                 queries.parallelStream().forEach(query -> handleQuery(query.getName(), query));
-                monitors.forEach(AbstractMonitor::run);
+                services.forEach(AbstractService::run);
 
                 try {
                     final long ms = getWaitTimeForQueries(queries.size());
-                    logger.info("Waiting for {} to span out API requests", millisToReadableTime(ms));
-                    Thread.sleep(ms);
+//                    logger.info("Waiting for {} to span out API requests", millisToReadableTime(ms));
+//                    Thread.sleep(ms);
                 } catch (Exception e) {
                     logger.error("Error spacing out API Requests", e);
                 }
@@ -113,11 +112,11 @@ public class TwitterScraper {
     void reconfigure() {
         Elective.ofNullable(getConfig())
                 .ifPresent(config -> {
-                    monitors.removeAll(Sets.newHashSet(updateMonitor, analysisMonitor));
-                    if (config.runUpdater) monitors.add(updateMonitor);
-                    if (config.getAnalysis().run) monitors.add(analysisMonitor);
+                    services.removeAll(Sets.newHashSet(updateService, analysisService));
+                    if (config.runUpdater) services.add(updateService);
+                    if (config.getAnalysis().run) services.add(analysisService);
                     setQueryList(config.convertQueries());
-                    monitors.forEach(monitor -> monitor.setConfig(config));
+                    services.forEach(service -> service.setConfig(config));
                 })
                 .orElse(() -> logger.error("Could not load config"));
     }
@@ -125,8 +124,8 @@ public class TwitterScraper {
     TwitterScraper setQueryList(final List<com.twitterscraper.model.Query> queries) {
         this.queries.clear();
         this.queries.addAll(queries);
-        monitors.forEach(abstractMonitor ->
-                abstractMonitor.setQueries(new ArrayList<>(this.queries)));
+        services.forEach(service ->
+                service.setQueries(new ArrayList<>(this.queries)));
         return this;
     }
 

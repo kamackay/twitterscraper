@@ -1,24 +1,26 @@
 package com.twitterscraper.db;
 
 import com.twitterscraper.utils.StringMaker;
-import com.twitterscraper.utils.TweetPrinter;
 import org.bson.Document;
 import twitter4j.*;
 
 import java.util.Arrays;
 import java.util.Optional;
 
+import static com.twitterscraper.utils.TweetPrinter.getTweetUrl;
 import static java.util.stream.Collectors.toList;
 
 public class Transforms {
 
     public static final String ID = "id";
+    public static final String TEXT = "text";
     static final String RETWEET_COUNT = "retweetCount";
+    public static final String ANALYSIS = "analysis";
     static final String FAVORITE_COUNT = "favoriteCount";
 
     static Document convert(final Status tweet) {
         final Document document = new Document(ID, tweet.getId())
-                .append("text", tweet.getText())
+                .append(TEXT, tweet.getText())
                 .append(RETWEET_COUNT, tweet.getRetweetCount())
                 .append("createdAt", tweet.getCreatedAt())
                 .append(FAVORITE_COUNT, tweet.getFavoriteCount())
@@ -41,7 +43,7 @@ public class Transforms {
                         Arrays.stream(tweet.getHashtagEntities())
                                 .map(Transforms::convert).collect(toList()))
                 .append("place", convert(tweet.getPlace()))
-                .append("tweetURL", new TweetPrinter(tweet).getTweetUrl());
+                .append("tweetURL", getTweetUrl(tweet));
 
         Optional.ofNullable(tweet.getUser()).ifPresent(user -> {
             document.append("user", convert(user));

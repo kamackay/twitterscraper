@@ -1,11 +1,13 @@
 package com.twitterscraper.db;
 
+import com.google.inject.ImplementedBy;
 import com.twitterscraper.utils.Elective;
 import org.bson.Document;
 import twitter4j.Status;
 
 import java.util.List;
 
+@ImplementedBy(DatabaseWrapperImpl.class)
 public interface DatabaseWrapper {
     long getMostRetweets(final String collectionName);
 
@@ -22,4 +24,6 @@ public interface DatabaseWrapper {
     Elective<Document> getById(final String collectionName, final long id);
 
     List<Long> getAllIds(final String name, final boolean b);
+
+    List<Long> getTweetsToAnalyze(final String name);
 }
