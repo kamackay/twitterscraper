@@ -18,7 +18,7 @@ public class Transforms {
     public static final String ANALYSIS = "analysis";
     static final String FAVORITE_COUNT = "favoriteCount";
 
-    static Document convert(final Status tweet) {
+    public static Document convert(final Status tweet) {
         final Document document = new Document(ID, tweet.getId())
                 .append(TEXT, tweet.getText())
                 .append(RETWEET_COUNT, tweet.getRetweetCount())

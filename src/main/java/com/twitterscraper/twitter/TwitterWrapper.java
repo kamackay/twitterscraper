@@ -38,7 +38,7 @@ public class TwitterWrapper {
     }
 
     private void init() {
-        resetLimitMap(false);
+        resetLimitMap(true);
         new Timer().schedule(new Task(this::resetLimitMap), 0, getWaitTimeForQueries(queryCount));
     }
 
@@ -84,7 +84,7 @@ public class TwitterWrapper {
             waitOnLimitSafe(SEARCH_TWEETS, 1);
             return Elective.of(search(query));
         } catch (TwitterException e) {
-            logger.error("Error searching Twitter", e);
+            logger.error("Error searching Twitter");
             return Elective.empty();
         } catch (InterruptedException e) {
             logger.error("Error acquiring semaphore", e);

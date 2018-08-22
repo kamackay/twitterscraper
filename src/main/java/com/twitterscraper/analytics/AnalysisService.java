@@ -13,10 +13,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.twitterscraper.db.Transforms.ANALYSIS;
-import static com.twitterscraper.db.Transforms.TEXT;
 import static com.twitterscraper.db.Transforms.millisToReadableTime;
-import static com.twitterscraper.utils.GeneralUtils.*;
-import static com.twitterscraper.utils.TweetPrinter.removeEmojis;
+import static com.twitterscraper.utils.GeneralUtils.async;
+import static com.twitterscraper.utils.GeneralUtils.toPercentString;
 
 public class AnalysisService extends AbstractService {
 
@@ -68,19 +67,8 @@ public class AnalysisService extends AbstractService {
         Elective<Document> safeTweet = db.getById(name, id);
         if (!safeTweet.isPresent()) return false;
         final Document tweet = safeTweet.get();
-        if (!needsAnalysis(tweet)) return false;
-        tweet.append(ANALYSIS,
-                new Document("time", System.currentTimeMillis())
-                        .append("result", analyzeTweet(tweet)));
-        db.upsert(tweet, name);
-        return true;
-    }
-
-    int analyzeTweet(final Document tweet) {
-        return analyzer.findSentiment(removeEmojis(tweet.getString(TEXT)));
-    }
-
-    private boolean needsAnalysis(final Document tweet) {
-        return tweet.get(ANALYSIS) == null;
+        SentimentAnalyzerImpl.AnalysisResult result = analyzer.analyze(tweet);
+        db.upsert(result.getTweet(), name);
+        return result.wasSuccessful();
     }
 }

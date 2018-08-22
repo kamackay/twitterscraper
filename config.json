@@ -20,6 +20,6 @@
 	"analysis": {
 		"run": false,
 		"timeToRun": 30000,
-		"countProgress": true
+		"countProgress": false
 	}
 }

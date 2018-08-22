@@ -4,7 +4,9 @@ import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.inject.Inject;
 import com.twitterscraper.analytics.AnalysisService;
+import com.twitterscraper.analytics.SentimentAnalyzer;
 import com.twitterscraper.db.DatabaseWrapper;
+import com.twitterscraper.db.Transforms;
 import com.twitterscraper.model.Config;
 import com.twitterscraper.model.Query;
 import com.twitterscraper.monitors.AbstractService;
@@ -22,8 +24,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.twitterscraper.db.Transforms.millisToReadableTime;
 import static com.twitterscraper.twitter.TwitterWrapper.getWaitTimeForQueries;
 import static com.twitterscraper.twitter.TwitterWrapper.twitter;
+import static com.twitterscraper.utils.GeneralUtils.async;
 
 
 public class TwitterScraper {
@@ -35,15 +39,18 @@ public class TwitterScraper {
     private final UpdateService updateService;
     private final AnalysisService analysisService;
     private final DatabaseWrapper db;
+    private final SentimentAnalyzer analyzer;
 
     @Inject
     TwitterScraper(
             final UpdateService updateService,
             final AnalysisService analysisService,
-            final DatabaseWrapper db) {
+            final DatabaseWrapper db,
+            final SentimentAnalyzer analyzer) {
         this.updateService = updateService;
         this.analysisService = analysisService;
         this.db = db;
+        this.analyzer = analyzer;
         queries = new ArrayList<>();
         services = new HashSet<>();
         reconfigure();
@@ -67,8 +74,8 @@ public class TwitterScraper {
 
                 try {
                     final long ms = getWaitTimeForQueries(queries.size());
-//                    logger.info("Waiting for {} to span out API requests", millisToReadableTime(ms));
-//                    Thread.sleep(ms);
+                    logger.info("Waiting for {} to span out API requests", millisToReadableTime(ms));
+                    Thread.sleep(ms);
                 } catch (Exception e) {
                     logger.error("Error spacing out API Requests", e);
                 }
@@ -98,8 +105,12 @@ public class TwitterScraper {
 
     private void handleResult(final QueryResult result, final String queryName) {
         final List<Status> tweets = result.getTweets();
+        // This is a new tweet. Run analysis on it
         final long newTweets = tweets.parallelStream()
+                .map(Transforms::convert)
                 .filter(tweet -> db.upsert(tweet, queryName))
+                .peek(tweet -> async(() ->
+                        db.upsert(analyzer.analyze(tweet).getTweet(), queryName)))
                 .count();
         if (newTweets > 0)
             logger.info("Query {} returned {} results, {} of which were new",
