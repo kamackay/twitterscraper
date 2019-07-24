@@ -1,6 +1,6 @@
 package com.twitterscraper.utils;
 
-import com.sun.istack.internal.NotNull;
+import org.jetbrains.annotations.NotNull;
 import com.twitterscraper.model.QueryModel;
 import twitter4j.Query;
 

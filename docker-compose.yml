@@ -1,0 +1,26 @@
+version: "2"
+
+services:
+  scraper:
+    build:
+      context: .
+    links:
+      - mongodb
+
+  mongodb:
+    image: mongo:latest
+    volumes:
+      - DB:/data/db
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+      MONGO_INITDB_DATABASE: admin
+
+volumes:
+  DB:
+
+networks:
+  default:
+    external:
+      name: network
