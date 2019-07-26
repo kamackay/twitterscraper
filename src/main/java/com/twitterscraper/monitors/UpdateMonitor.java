@@ -10,32 +10,35 @@ import twitter4j.Status;
 import java.util.ArrayList;
 
 import static com.twitterscraper.twitter.TwitterWrapper.twitter;
+import static com.twitterscraper.utils.Utils.formatBytes;
 
 /**
  * This is more of an example of a monitor, and not actually all that useful
  */
 public class UpdateMonitor extends AbstractMonitor {
 
-    @Inject
-    public UpdateMonitor(final DatabaseWrapper db) {
-        super(db);
-    }
+  @Inject
+  public UpdateMonitor(final DatabaseWrapper db) {
+    super(db);
+  }
 
-    @Override
-    public void run() {
-        new ArrayList<>(queries).parallelStream()
-                .map(Query::getName)
-                .forEach(this::handleQuery);
-    }
+  @Override
+  public void run() {
+    new ArrayList<>(queries).parallelStream()
+        .map(Query::getName)
+        .forEach(this::handleQuery);
+  }
 
-    @Benchmark(paramName = true, limit = 1000)
-    void handleQuery(final String name) {
-        final long id = db.getMostRetweets(name);
-        final Elective<Status> safeTweet = twitter().getTweetSafe(id);
-        safeTweet.ifPresent(tweet -> {
-            db.upsert(tweet, name);
-            logger.info("Updated ID {} for Query {}",
-                    id, name);
-        });
-    }
+  @Benchmark(paramName = true, limit = 1000)
+  void handleQuery(final String name) {
+    final long id = db.getMostRetweets(name);
+    final Elective<Status> safeTweet = twitter().getTweetSafe(id);
+    safeTweet.ifPresent(tweet -> {
+      db.upsert(tweet, name);
+      logger.info("Updated ID {} for Query {}",
+          id, name);
+    });
+    logger.info("{} documents in the '{}' collection, {}", db.count(name), name,
+        formatBytes(db.sizeInBytes(name)));
+  }
 }

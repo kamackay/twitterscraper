@@ -1,11 +1,11 @@
 FROM kamackay/alpine
 
-WORKDIR /TwitterScraper
+RUN mkdir -p /opt/project
+COPY target/*jar-with-dependencies.jar /opt/project/scraper.jar
 
-ADD ./ ./
+WORKDIR /opt/project
+EXPOSE 5656
+ADD config.json config.json
+ADD twitter4j.properties twitter4j.properties
 
-#RUN rm -rf ./target
-
-RUN mvn clean && mvn install
-
-CMD ["java", "-jar", "target/twitterscraper-1.0.0.jar"]
+CMD ["java", "-jar", "scraper.jar"]

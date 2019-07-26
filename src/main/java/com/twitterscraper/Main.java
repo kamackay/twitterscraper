@@ -1,26 +1,18 @@
 package com.twitterscraper;
 
-import com.google.inject.Guice;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.twitterscraper.utils.Elective;
 
-/**
- * Entry point class
- */
 public class Main {
-
-    private static Logger logger = LoggerFactory.getLogger(Main.class);
-
-    /**
-     * Main
-     *
-     * @param args - args
-     */
-    public static void main(String[] args) {
-        try {
-            Guice.createInjector(new MainModule()).getInstance(TwitterScraper.class).start();
-        } catch (Exception e) {
-            logger.error("Error Running TwitterScraper!", e);
-        }
+  public static void main(String[] args) {
+    final Elective<String> mode = Elective.ofNullable(System.getenv("MODE"));
+    switch (mode.map(String::toLowerCase).orElse("scraper")) {
+      default:
+      case "scraper":
+        ScraperMain.start();
+        break;
+      case "server":
+        ServerMain.start();
+        break;
     }
+  }
 }

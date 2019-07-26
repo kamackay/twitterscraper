@@ -19,7 +19,7 @@ public abstract class AbstractMonitor {
         queries = new ArrayList<>();
     }
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(AbstractMonitor.class);
 
     public void setQueries(List<Query> queries) {
         this.queries.clear();

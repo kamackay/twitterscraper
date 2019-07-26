@@ -4,14 +4,14 @@ import java.util.TimerTask;
 
 public class Task extends TimerTask {
 
-    private final Runnable runnable;
+  private final Runnable runnable;
 
-    public Task(final Runnable runnable){
-        this.runnable = runnable;
-    }
+  public Task(final Runnable runnable) {
+    this.runnable = runnable;
+  }
 
-    @Override
-    public void run() {
-        runnable.run();
-    }
+  @Override
+  public void run() {
+    runnable.run();
+  }
 }
