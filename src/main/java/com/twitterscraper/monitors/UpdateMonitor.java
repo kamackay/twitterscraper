@@ -38,7 +38,9 @@ public class UpdateMonitor extends AbstractMonitor {
           if (config != null &&
               limit.getSecondsUntilReset() <=
                   TwitterWrapper.getWaitTimeForQueries(config.queries.size())) {
-            return limit.getRemaining() / config.queries.size();
+            final int n = limit.getRemaining() / config.queries.size();
+            logger.info("Burn through the remaining {} requests for {}", n, name);
+            return n;
           }
           return limit.getRemaining() / 100;
         })
