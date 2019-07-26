@@ -88,11 +88,15 @@ public class TwitterScraper extends Component {
 
   private void logDatabaseSize() {
     // Print the full size of the database, for record-keeping
-    final long totalSize = queries.stream().
-        map(Query::getName)
+    final long totalSize = queries.stream()
+        .map(Query::getName)
         .mapToLong(this.db::sizeInBytes)
         .sum();
-    logger.info("Total Database size is {}", formatBytes(totalSize));
+    final long totalCount = queries.stream()
+        .map(Query::getName)
+        .mapToLong(this.db::count)
+        .sum();
+    logger.info("Total Database size is {}, {} records", formatBytes(totalSize), totalCount);
   }
 
   private void handleResult(final QueryResult result, final String queryName) {
