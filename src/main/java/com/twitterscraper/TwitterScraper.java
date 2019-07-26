@@ -20,6 +20,7 @@ import java.util.Set;
 import static com.twitterscraper.db.Transforms.millisToReadableTime;
 import static com.twitterscraper.twitter.TwitterWrapper.getWaitTimeForQueries;
 import static com.twitterscraper.twitter.TwitterWrapper.twitter;
+import static com.twitterscraper.utils.Utils.formatBytes;
 
 
 public class TwitterScraper extends Component {
@@ -48,7 +49,10 @@ public class TwitterScraper extends Component {
   public void run() {
     reconfigure();
     queries.parallelStream().forEach(query -> handleQuery(query.getName(), query));
+
     monitors.forEach(AbstractMonitor::run);
+
+    this.logDatabaseSize();
 
     try {
       final long ms = getWaitTimeForQueries(queries.size());
@@ -63,7 +67,7 @@ public class TwitterScraper extends Component {
   void handleQuery(final String queryName, final Query query) {
     try {
       db.verifyIndex(queryName);
-      if (!query.getModel().getUpdateExisting())
+      if (!query.getModel().isUpdateExisting())
         query.getQuery().sinceId(db.getMostRecent(queryName));
 
       final Elective<QueryResult> safeResult = twitter().searchSafe(query.getQuery());
@@ -75,6 +79,15 @@ public class TwitterScraper extends Component {
     } catch (Exception e) {
       logger.error("Error handling query " + queryName, e);
     }
+  }
+
+  private void logDatabaseSize() {
+    // Print the full size of the database, for record-keeping
+    final long totalSize = queries.stream().
+        map(Query::getName)
+        .mapToLong(this.db::sizeInBytes)
+        .sum();
+    logger.info("Total Database size is {}", formatBytes(totalSize));
   }
 
   private void handleResult(final QueryResult result, final String queryName) {

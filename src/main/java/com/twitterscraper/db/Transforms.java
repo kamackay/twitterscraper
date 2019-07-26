@@ -34,16 +34,20 @@ public class Transforms {
         .append("source", tweet.getSource())
         .append("userMentionedEntities",
             Arrays.stream(tweet.getUserMentionEntities())
-                .map(Transforms::convert).collect(toList()))
+                .map(Transforms::convert)
+                .collect(toList()))
         .append("mediaEntities",
             Arrays.stream(tweet.getMediaEntities())
-                .map(Transforms::convert).collect(toList()))
+                .map(Transforms::convert)
+                .collect(toList()))
         .append("urlEntities",
             Arrays.stream(tweet.getURLEntities())
-                .map(Transforms::convert).collect(toList()))
+                .map(Transforms::convert)
+                .collect(toList()))
         .append("hashtagEntities",
             Arrays.stream(tweet.getHashtagEntities())
-                .map(Transforms::convert).collect(toList()))
+                .map(Transforms::convert)
+                .collect(toList()))
         .append("place", convert(tweet.getPlace()))
         .append("tweetURL", new TweetPrinter(tweet).getTweetUrl());
 

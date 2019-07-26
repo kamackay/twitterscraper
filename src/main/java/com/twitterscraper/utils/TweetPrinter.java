@@ -32,7 +32,7 @@ public class TweetPrinter {
   }
 
   public String getTweetUrl() {
-    return "https://twitter.com/statuses/" + tweet.getId();
+    return "https://twitter.com/id/status/" + tweet.getId();
   }
 
   private Place getPlace() {

@@ -1,20 +1,20 @@
 package com.twitterscraper.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AccessLevel;
+
 import java.util.List;
 
+@lombok.Data
+@lombok.Builder(toBuilder = true, builderClassName = "Builder", access = AccessLevel.PUBLIC)
+@lombok.NoArgsConstructor(force = true, access = AccessLevel.PUBLIC)
+@lombok.AllArgsConstructor(access = AccessLevel.PUBLIC)
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class QueryModel {
-  public List<String> mentions;
-  public List<String> quotes;
-  public List<String> hashtags;
-  public boolean includeRetweets;
-  public String queryName;
-  public boolean updateExisting = true;
-
-  public String getQueryName() {
-    return queryName;
-  }
-
-  public boolean getUpdateExisting() {
-    return updateExisting;
-  }
+  List<String> mentions;
+  List<String> quotes;
+  List<String> hashtags;
+  boolean includeRetweets;
+  String queryName;
+  boolean updateExisting = true;
 }
