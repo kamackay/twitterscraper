@@ -11,7 +11,7 @@ public class Utils {
       dbytes /= 1024;
       unit++;
     }
-    return String.format("%.2f %s", dbytes, Arrays.asList(
+    return String.format("%.4f %s", dbytes, Arrays.asList(
         "bytes",
         "kB",
         "MB",
