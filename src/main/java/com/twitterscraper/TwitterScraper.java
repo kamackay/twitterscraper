@@ -76,6 +76,9 @@ public class TwitterScraper extends Component {
         return;
       }
       safeResult.ifPresent(result -> this.handleResult(result, queryName));
+
+      logger.info("{} documents in the '{}' collection, {}", db.count(queryName), queryName,
+          formatBytes(db.sizeInBytes(queryName)));
     } catch (Exception e) {
       logger.error("Error handling query " + queryName, e);
     }
