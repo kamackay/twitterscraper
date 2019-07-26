@@ -36,7 +36,7 @@ public class UpdateMonitor extends AbstractMonitor {
         .getLimit(STATUSES_SHOW.getName())
         .map(limit -> {
           if (config != null &&
-              limit.getSecondsUntilReset() <=
+              limit.getSecondsUntilReset() * 1000 <=
                   TwitterWrapper.getWaitTimeForQueries(config.queries.size())) {
             final int n = limit.getRemaining() / config.queries.size();
             logger.info("Burn through the remaining {} requests for {}", n, name);
