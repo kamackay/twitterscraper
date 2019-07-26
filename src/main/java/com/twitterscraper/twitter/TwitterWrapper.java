@@ -11,9 +11,11 @@ import twitter4j.conf.ConfigurationBuilder;
 import java.util.Map;
 import java.util.Timer;
 import java.util.concurrent.Semaphore;
+import java.util.function.Predicate;
 
 import static com.twitterscraper.db.Transforms.millisToReadableTime;
 import static com.twitterscraper.twitter.RateLimit.*;
+import static com.twitterscraper.utils.Utils.padString;
 
 public class TwitterWrapper {
 
@@ -169,7 +171,7 @@ public class TwitterWrapper {
         logger.info("Sleeping for {} to refresh \"{}\" limit",
             millisToReadableTime(sleep * 1000),
             rateLimit.getName());
-        if (sleep >= 0) Thread.sleep(sleep * 1000);
+        if (sleep >= 0) Thread.sleep(sleep * 500);
       }
       return true;
     } finally {
@@ -193,7 +195,7 @@ public class TwitterWrapper {
     }
   }
 
-  private Elective<RateLimitStatus> getLimit(final String name) {
+  public Elective<RateLimitStatus> getLimit(final String name) {
     return Elective.ofNullable(limitMap.get(name));
   }
 
@@ -233,11 +235,26 @@ public class TwitterWrapper {
 
   }
 
-  private void logAllLimits() {
-    limitMap.forEach((s, rateLimitStatus) -> {
-      if (rateLimitStatus.getLimit() != rateLimitStatus.getRemaining())
-        logger.info("\tLimit: {}: {}",
-            s, rateLimitStatus.getRemaining());
-    });
+  public void logAllLimits() {
+    final Predicate<Map.Entry<String, RateLimitStatus>> filter = entry ->
+        entry.getValue().getLimit() != entry.getValue().getRemaining();
+
+    final int longestName = limitMap.entrySet()
+        .stream()
+        .filter(filter)
+        .map(Map.Entry::getKey)
+        .mapToInt(String::length)
+        .max()
+        .orElse(20);
+
+    limitMap.entrySet().stream()
+        .filter(filter)
+        .forEach(set -> {
+          final RateLimitStatus limit = set.getValue();
+          logger.info("\tLimit: {}: {} - Resets in {} seconds",
+              padString(set.getKey(), longestName + 2),
+              padString(String.valueOf(limit.getRemaining()), 6),
+              padString(String.valueOf(limit.getSecondsUntilReset()), 4, true));
+        });
   }
 }

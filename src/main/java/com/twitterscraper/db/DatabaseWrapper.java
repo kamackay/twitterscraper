@@ -1,5 +1,6 @@
 package com.twitterscraper.db;
 
+import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import twitter4j.Status;
 
@@ -20,4 +21,6 @@ public interface DatabaseWrapper {
 
   Collection<Document> getAll(final String collectionName, final Document filter);
   Collection<Document> getAll(final String collectionName);
+
+  MongoCollection<Document> getCollection(final String name);
 }

@@ -38,7 +38,7 @@ public class DatabaseWrapperImpl implements DatabaseWrapper {
     this.collectionCache = new HashMap<>();
   }
 
-  private MongoCollection<Document> getCollection(final String name) {
+  public MongoCollection<Document> getCollection(final String name) {
     final MongoCollection<Document> collection = Elective
         .ofNullable(this.collectionCache.get(name))
         .orElseGet(() -> this.db.getCollection(name));

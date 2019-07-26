@@ -18,4 +18,24 @@ public class Utils {
         "TB", "PB", "EB", "ZB", "YB"
     ).get(unit));
   }
+
+  public static String padString(final String s, final int length) {
+    return padString(s, length, false, ' ');
+  }
+
+  public static String padString(final String s, final int length, final boolean start) {
+    return padString(s, length, start, ' ');
+  }
+
+  public static String padString(
+      final String s, final int length,
+      final boolean start, final char c) {
+    final StringBuilder builder = new StringBuilder();
+    if (!start) builder.append(s);
+    for (int x = 0; x < Math.max(length - s.length(), 0); x++) {
+      builder.append(c);
+    }
+    if (start) builder.append(s);
+    return builder.toString();
+  }
 }

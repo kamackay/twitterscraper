@@ -5,7 +5,7 @@
       "mentions": [
         "realDonaldTrump"
       ],
-      "updateExisting": false
+      "updateExisting": true
     },
     {
       "queryName": "OcasioMentions",

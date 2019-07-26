@@ -8,6 +8,7 @@ import com.twitterscraper.monitors.AbstractMonitor;
 import com.twitterscraper.monitors.UpdateMonitor;
 import com.twitterscraper.utils.Elective;
 import com.twitterscraper.utils.benchmark.Benchmark;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import twitter4j.QueryResult;
 import twitter4j.Status;
@@ -29,7 +30,7 @@ public class TwitterScraper extends Component {
   private final Set<AbstractMonitor> monitors;
   private final UpdateMonitor updateMonitor;
   private final DatabaseWrapper db;
-  private org.slf4j.Logger logger = LoggerFactory.getLogger(TwitterScraper.class);
+  private Logger logger = LoggerFactory.getLogger(TwitterScraper.class);
 
   @Inject
   TwitterScraper(
@@ -52,6 +53,7 @@ public class TwitterScraper extends Component {
 
     monitors.forEach(AbstractMonitor::run);
 
+    twitter().logAllLimits();
     this.logDatabaseSize();
 
     try {

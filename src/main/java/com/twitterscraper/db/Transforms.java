@@ -12,7 +12,7 @@ import static java.util.stream.Collectors.toList;
 
 public class Transforms {
 
-  static final String ID = "id";
+  public static final String ID = "id";
   static final String RETWEET_COUNT = "retweetCount";
   static final String FAVORITE_COUNT = "favoriteCount";
   private final static long DAY = 86400000;
