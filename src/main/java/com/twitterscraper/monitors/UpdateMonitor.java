@@ -3,9 +3,10 @@ package com.twitterscraper.monitors;
 import com.google.inject.Inject;
 import com.mongodb.client.model.Aggregates;
 import com.twitterscraper.db.DatabaseWrapper;
+import com.twitterscraper.model.Config;
 import com.twitterscraper.model.Query;
+import com.twitterscraper.twitter.TwitterWrapper;
 import com.twitterscraper.utils.benchmark.Benchmark;
-import twitter4j.RateLimitStatus;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,9 +15,6 @@ import static com.twitterscraper.db.Transforms.ID;
 import static com.twitterscraper.twitter.RateLimit.STATUSES_SHOW;
 import static com.twitterscraper.twitter.TwitterWrapper.twitter;
 
-/**
- * This is more of an example of a monitor, and not actually all that useful
- */
 public class UpdateMonitor extends AbstractMonitor {
 
   @Inject
@@ -33,10 +31,17 @@ public class UpdateMonitor extends AbstractMonitor {
 
   @Benchmark(paramName = true, limit = 1000)
   void handleQuery(final String name) {
+    final Config config = Config.get();
     final int numberToUpdate = twitter()
         .getLimit(STATUSES_SHOW.getName())
-        .map(RateLimitStatus::getRemaining)
-        .map(limit -> limit / 100)
+        .map(limit -> {
+          if (config != null &&
+              limit.getSecondsUntilReset() <=
+                  TwitterWrapper.getWaitTimeForQueries(config.queries.size())) {
+            return limit.getRemaining() / config.queries.size();
+          }
+          return limit.getRemaining() / 100;
+        })
         .orElse(2);
     db.getCollection(name)
         .aggregate(Collections.singletonList(Aggregates.sample(numberToUpdate)))

@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.twitterscraper.utils.Elective;
 import com.twitterscraper.utils.Task;
 import com.twitterscraper.utils.benchmark.Benchmark;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
@@ -23,7 +24,7 @@ public class TwitterWrapper {
   private final Twitter twitter;
   private final Map<String, RateLimitStatus> limitMap;
   private final Semaphore sem = new Semaphore(1, true);
-  private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
+  private Logger logger = LoggerFactory.getLogger(getClass());
   private int queryCount = 4;
 
   private TwitterWrapper() {
@@ -106,7 +107,6 @@ public class TwitterWrapper {
     return new TwitterFactory(new ConfigurationBuilder()
         .setGZIPEnabled(true)
         .setTweetModeExtended(true)
-//        .setIncludeEmailEnabled(true)
         .build())
         .getInstance();
   }
