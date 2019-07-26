@@ -53,7 +53,7 @@ public class TwitterWrapper {
    * @return ms to wait
    */
   public static long getWaitTimeForQueries(final int queryCount) {
-    return Math.min((int) Math.pow(queryCount, 2), 60) * 1000;
+    return Math.min((int) Math.pow(queryCount, 2), 60) * 500;
   }
 
   protected TwitterWrapper setQueryCount(final int queryCount) {
@@ -171,7 +171,7 @@ public class TwitterWrapper {
         logger.info("Sleeping for {} to refresh \"{}\" limit",
             millisToReadableTime(sleep * 1000),
             rateLimit.getName());
-        if (sleep >= 0) Thread.sleep(sleep * 500);
+        if (sleep >= 0) Thread.sleep(sleep * 1000);
       }
       return true;
     } finally {
