@@ -1,6 +1,7 @@
-package com.twitterscraper;
+package com.twitterscraper.scraper;
 
 import com.google.inject.Inject;
+import com.twitterscraper.Component;
 import com.twitterscraper.db.DatabaseWrapper;
 import com.twitterscraper.model.Config;
 import com.twitterscraper.model.Query;
@@ -10,18 +11,18 @@ import com.twitterscraper.utils.Elective;
 import com.twitterscraper.utils.benchmark.Benchmark;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import twitter4j.QueryResult;
-import twitter4j.Status;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.twitterscraper.db.Transforms.millisToReadableTime;
 import static com.twitterscraper.twitter.TwitterWrapper.getWaitTimeForQueries;
 import static com.twitterscraper.twitter.TwitterWrapper.twitter;
 import static com.twitterscraper.utils.Utils.formatBytes;
+import static com.twitterscraper.utils.Utils.padString;
 
 
 public class TwitterScraper extends Component {
@@ -49,11 +50,32 @@ public class TwitterScraper extends Component {
 
   public void run() {
     reconfigure();
-    queries.parallelStream().forEach(query -> handleQuery(query.getName(), query));
+    queries.parallelStream().forEach(query -> query.handleQuery(db));
 
     monitors.forEach(AbstractMonitor::run);
 
     twitter().logAllLimits();
+    List<Query.StatusCheck> checks = queries.stream()
+        .map(query -> query.status(db))
+        .collect(Collectors.toList());
+
+    final int longestName = checks.stream()
+        .map(Query.StatusCheck::getName)
+        .mapToInt(String::length)
+        .max()
+        .orElse(0);
+    final int longestSize = checks.stream()
+        .map(Query.StatusCheck::getNumDocuments)
+        .map(String::valueOf)
+        .mapToInt(String::length)
+        .max().orElse(0);
+    logger.info("Collection Statuses:");
+    checks.forEach(check -> {
+      logger.info("{}: Records: {}, Size: {}",
+          padString(check.getName(), longestName),
+          padString(String.valueOf(check.getNumDocuments()), longestSize),
+          formatBytes(check.getNumBytes()));
+    });
     this.logDatabaseSize();
 
     try {
@@ -62,27 +84,6 @@ public class TwitterScraper extends Component {
       Thread.sleep(ms);
     } catch (Exception e) {
       logger.error("Error spacing out API Requests", e);
-    }
-  }
-
-  @Benchmark(paramName = true, limit = 1000)
-  void handleQuery(final String queryName, final Query query) {
-    try {
-      db.verifyIndex(queryName);
-      if (!query.getModel().isUpdateExisting())
-        query.getQuery().sinceId(db.getMostRecent(queryName));
-
-      final Elective<QueryResult> safeResult = twitter().searchSafe(query.getQuery());
-      if (!safeResult.isPresent()) {
-        logger.error("Error fetching results for Query " + queryName);
-        return;
-      }
-      safeResult.ifPresent(result -> this.handleResult(result, queryName));
-
-      logger.info("{} documents in the '{}' collection, {}", db.count(queryName), queryName,
-          formatBytes(db.sizeInBytes(queryName)));
-    } catch (Exception e) {
-      logger.error("Error handling query " + queryName, e);
     }
   }
 
@@ -97,18 +98,6 @@ public class TwitterScraper extends Component {
         .mapToLong(this.db::count)
         .sum();
     logger.info("Total Database size is {}, {} records", formatBytes(totalSize), totalCount);
-  }
-
-  private void handleResult(final QueryResult result, final String queryName) {
-    final List<Status> tweets = result.getTweets();
-    final long newTweets = tweets.parallelStream()
-        .filter(tweet -> db.upsert(tweet, queryName))
-        .count();
-    if (newTweets > 0)
-      logger.info("Query {} returned {} results, {} of which were new",
-          queryName,
-          tweets.size(),
-          newTweets);
   }
 
   @Benchmark(limit = 10)

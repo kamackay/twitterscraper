@@ -1,5 +1,7 @@
 package com.twitterscraper;
 
+import com.twitterscraper.scraper.ScraperMain;
+import com.twitterscraper.server.ServerMain;
 import com.twitterscraper.utils.Elective;
 
 public class Main {

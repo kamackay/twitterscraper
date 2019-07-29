@@ -12,6 +12,8 @@ import com.mongodb.client.model.UpdateOptions;
 import com.twitterscraper.utils.Elective;
 import com.twitterscraper.utils.benchmark.Benchmark;
 import org.bson.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import twitter4j.Status;
 
 import java.util.*;
@@ -22,6 +24,7 @@ import static com.twitterscraper.db.Transforms.*;
 public class DatabaseWrapperImpl implements DatabaseWrapper {
 
   private static final long DEFAULT_LONG = -1;
+  private Logger logger = LoggerFactory.getLogger(getClass());
 
   private final MongoDatabase db;
 
@@ -70,7 +73,7 @@ public class DatabaseWrapperImpl implements DatabaseWrapper {
       this.getCollection(collectionName)
           .createIndex(new Document(ID, 1), new IndexOptions().unique(true));
     } catch (Exception e) {
-      // ?
+      logger.error("Error while verifying index", e);
     }
   }
 

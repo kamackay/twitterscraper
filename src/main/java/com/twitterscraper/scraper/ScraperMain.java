@@ -1,20 +1,23 @@
-package com.twitterscraper;
+package com.twitterscraper.scraper;
 
 import com.google.inject.Guice;
-import com.twitterscraper.server.Server;
-import com.twitterscraper.server.ServerModule;
+import com.twitterscraper.MainModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class ServerMain {
+/**
+ * Entry point class
+ */
+public class ScraperMain {
+
   private static Logger logger = LoggerFactory.getLogger(ScraperMain.class);
 
   /**
    * Start up the Scraper Server
    */
-  static void start() {
+  public static void start() {
     try {
-      Guice.createInjector(new ServerModule()).getInstance(Server.class).start();
+      Guice.createInjector(new MainModule()).getInstance(TwitterScraper.class).start();
     } catch (Exception e) {
       logger.error("Error Running TwitterScraper!", e);
     }

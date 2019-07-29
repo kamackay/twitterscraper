@@ -2,6 +2,7 @@ package com.twitterscraper.model;
 
 import com.google.gson.Gson;
 import com.twitterscraper.utils.QueryBuilder;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
@@ -11,6 +12,7 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 
 public class Config {
+  private static Logger logger = LoggerFactory.getLogger(Config.class);
 
   public List<QueryModel> queries;
   public boolean runUpdater;
@@ -24,7 +26,7 @@ public class Config {
     try {
       return new Gson().fromJson(new FileReader("config.json"), Config.class);
     } catch (FileNotFoundException e) {
-      LoggerFactory.getLogger(Config.class).error("Error Finding Config File", e);
+      logger.error("Error Reading Config File", e);
       return null;
     }
   }

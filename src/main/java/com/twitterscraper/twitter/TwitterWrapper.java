@@ -213,8 +213,6 @@ public class TwitterWrapper {
       waitOnLimitSafe(STATUSES_SHOW, 5);
       sem.acquire();
       return twitter.showStatus(id);
-    } catch (TwitterException e) {
-      throw e;
     } finally {
       sem.release();
     }
@@ -230,6 +228,7 @@ public class TwitterWrapper {
     try {
       return Elective.of(getTweet(id));
     } catch (TwitterException | InterruptedException | NullPointerException e) {
+      logger.error("Error getting tweet, Code 179 means that the tweet is private", e);
       return Elective.empty();
     }
 
@@ -238,6 +237,7 @@ public class TwitterWrapper {
   public void logAllLimits() {
     final Predicate<Map.Entry<String, RateLimitStatus>> filter = entry ->
         entry.getValue().getLimit() != entry.getValue().getRemaining();
+//    final Predicate<Map.Entry<String, RateLimitStatus>> filter = entry -> true;
 
     final int longestName = limitMap.entrySet()
         .stream()
