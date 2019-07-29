@@ -228,7 +228,7 @@ public class TwitterWrapper {
     try {
       return Elective.of(getTweet(id));
     } catch (TwitterException | InterruptedException | NullPointerException e) {
-      logger.error("Error getting tweet, Code 179 means that the tweet is private", e);
+//      logger.error("Error getting tweet, Code 179 means that the tweet is private", e);
       return Elective.empty();
     }
 
