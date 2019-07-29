@@ -116,11 +116,13 @@ public class DatabaseWrapperImpl implements DatabaseWrapper {
   }
 
   @Override
+  @Benchmark(paramName = true, limit = 10)
   public long sizeInBytes(String collectionName) {
     return this.db.runCommand(new Document("collStats", collectionName))
         .getInteger("storageSize");
   }
 
+  @Benchmark(paramName = true, limit = 10)
   public long count(final String collectionName) {
     return db.getCollection(collectionName).countDocuments();
   }
