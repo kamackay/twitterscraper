@@ -5,6 +5,7 @@ import com.twitterscraper.Component;
 import com.twitterscraper.db.DatabaseWrapper;
 import com.twitterscraper.model.Config;
 import com.twitterscraper.model.Query;
+import com.twitterscraper.model.Query.StatusCheck;
 import com.twitterscraper.monitors.AbstractMonitor;
 import com.twitterscraper.monitors.UpdateMonitor;
 import com.twitterscraper.utils.Elective;
@@ -55,28 +56,28 @@ public class TwitterScraper extends Component {
     monitors.forEach(AbstractMonitor::run);
 
     twitter().logAllLimits();
-    List<Query.StatusCheck> checks = queries.stream()
+    List<StatusCheck> checks = queries.stream()
         .map(query -> query.status(db))
         .collect(Collectors.toList());
 
     final int longestName = checks.stream()
-        .map(Query.StatusCheck::getName)
+        .map(StatusCheck::getName)
         .mapToInt(String::length)
         .max()
         .orElse(0);
     final int longestSize = checks.stream()
-        .map(Query.StatusCheck::getNumDocuments)
+        .map(StatusCheck::getNumDocuments)
         .map(String::valueOf)
         .mapToInt(String::length)
         .max().orElse(0);
     logger.info("Collection Statuses:");
     checks.forEach(check -> {
-      logger.info("{}: Records: {}, Size: {}",
+      logger.info("\t{}: Records: {}, Size: {}",
           padString(check.getName(), longestName),
           padString(String.valueOf(check.getNumDocuments()), longestSize),
           formatBytes(check.getNumBytes()));
     });
-    this.logDatabaseSize();
+    this.logDatabaseSize(checks);
 
     try {
       final long ms = getWaitTimeForQueries(queries.size());
@@ -87,15 +88,13 @@ public class TwitterScraper extends Component {
     }
   }
 
-  private void logDatabaseSize() {
+  private void logDatabaseSize(final List<StatusCheck> checks) {
     // Print the full size of the database, for record-keeping
-    final long totalSize = queries.stream()
-        .map(Query::getName)
-        .mapToLong(this.db::sizeInBytes)
+    final long totalSize = checks.stream()
+        .mapToLong(StatusCheck::getNumBytes)
         .sum();
-    final long totalCount = queries.stream()
-        .map(Query::getName)
-        .mapToLong(this.db::count)
+    final long totalCount = checks.stream()
+        .mapToLong(StatusCheck::getNumDocuments)
         .sum();
     logger.info("Total Database size is {}, {} records", formatBytes(totalSize), totalCount);
   }
