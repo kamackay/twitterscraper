@@ -7,9 +7,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.EstimatedDocumentCountOptions;
-import com.mongodb.client.model.IndexOptions;
-import com.mongodb.client.model.UpdateOptions;
+import com.mongodb.client.model.*;
 import com.twitterscraper.utils.Elective;
 import com.twitterscraper.utils.benchmark.Benchmark;
 import org.bson.Document;
@@ -92,11 +90,12 @@ public class DatabaseWrapperImpl implements DatabaseWrapper {
         .orElse(DEFAULT_LONG);
   }
 
-  @Benchmark(paramName = true, limit = 10)
+  @Benchmark(paramName = true, limit = 1)
   public long getMostRetweets(final String collectionName) {
     return Elective.ofNullable(this.getCollection(collectionName)
-        .find()
-        .sort(new Document(RETWEET_COUNT, -1))
+        .aggregate(Collections.singletonList(
+            Aggregates.group(null,
+                Accumulators.max(RETWEET_COUNT, 1))))
         .first())
         .map(d -> d.getLong(ID))
         .orElse(DEFAULT_LONG);
