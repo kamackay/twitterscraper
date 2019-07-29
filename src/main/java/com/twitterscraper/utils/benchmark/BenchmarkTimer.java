@@ -18,7 +18,7 @@ public class BenchmarkTimer {
   private static BenchmarkTimer instance = null;
   private final Map<String, BenchmarkData> startTimes;
   private long limit = 0;
-  private Logger logger = LoggerFactory.getLogger(getClass());
+  private Logger logger = LoggerFactory.getLogger(BenchmarkTimer.class.getSimpleName());
 
   private BenchmarkTimer() {
     startTimes = new HashMap<>();

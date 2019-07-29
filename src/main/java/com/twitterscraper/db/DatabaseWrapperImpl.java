@@ -7,6 +7,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.EstimatedDocumentCountOptions;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.UpdateOptions;
 import com.twitterscraper.utils.Elective;
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import twitter4j.Status;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.twitterscraper.db.Transforms.*;
@@ -24,10 +26,8 @@ import static com.twitterscraper.db.Transforms.*;
 public class DatabaseWrapperImpl implements DatabaseWrapper {
 
   private static final long DEFAULT_LONG = -1;
-  private Logger logger = LoggerFactory.getLogger(getClass());
-
   private final MongoDatabase db;
-
+  private Logger logger = LoggerFactory.getLogger(getClass());
   private Map<String, MongoCollection<Document>> collectionCache;
 
   @Inject
@@ -124,6 +124,9 @@ public class DatabaseWrapperImpl implements DatabaseWrapper {
 
   @Benchmark(paramName = true, limit = 10)
   public long count(final String collectionName) {
-    return db.getCollection(collectionName).countDocuments();
+    return db.getCollection(collectionName)
+        .estimatedDocumentCount(
+            new EstimatedDocumentCountOptions()
+                .maxTime(2, TimeUnit.SECONDS));
   }
 }
