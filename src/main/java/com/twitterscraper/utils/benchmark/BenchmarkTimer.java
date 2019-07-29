@@ -68,7 +68,7 @@ public class BenchmarkTimer {
     dataElective.ifPresent(data -> {
       final long time = System.currentTimeMillis() - data.getStartTime();
       if (time > data.getLimit() || data.getLogAbsolute()) {
-        logger.warn("Benchmark \"{}\" completed in {}",
+        logger.warn("Benchmark '{}' completed in {}",
             benchmarkName,
             millisToReadableTime(time));
       }
