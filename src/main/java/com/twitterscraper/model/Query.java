@@ -65,7 +65,7 @@ public class Query implements ICloneable<Query> {
   private void handleResult(final QueryResult result, final DatabaseWrapper db) {
     final List<Status> tweets = result.getTweets();
     final long newTweets = tweets.parallelStream()
-        .filter(tweet -> db.upsert(tweet, this.getName()))
+        .filter(tweet -> db.upsert(tweet, this.getName()) > 0)
         .count();
     if (newTweets > 0)
       logger.info("Query {} returned {} results, {} of which were new",

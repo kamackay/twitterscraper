@@ -52,19 +52,20 @@ public class DatabaseWrapperImpl implements DatabaseWrapper {
    *
    * @param tweet          - The tweet to add to the database
    * @param collectionName - The collection to add the tweet to
-   * @return boolean of whether the tweet was new
+   * @return Number of times this tweet has been updated
    */
-  public boolean upsert(final Status tweet, final String collectionName) {
-    final int timesUpdated = Elective.ofNullable(this.getCollection(collectionName)
+  public int upsert(final Status tweet, final String collectionName) {
+    int timesUpdated = Elective.ofNullable(this.getCollection(collectionName)
         .find(eq("id", tweet.getId()))
         .first())
         .map(d -> d.getInteger("timesUpdated"))
         .orElse(-1);
-    return this.getCollection(collectionName)
+    this.getCollection(collectionName)
         .updateOne(eq("id", tweet.getId()),
             new Document("$set", convert(tweet)
-                .append("timesUpdated", timesUpdated + 1)),
-            new UpdateOptions().upsert(true)).getMatchedCount() == 0;
+                .append("timesUpdated", ++timesUpdated)),
+            new UpdateOptions().upsert(true));
+    return timesUpdated;
   }
 
   /**

@@ -9,7 +9,7 @@ import java.util.Collection;
 public interface DatabaseWrapper {
   long getMostRetweets(final String collectionName);
 
-  boolean upsert(final Status tweet, final String name);
+  int upsert(final Status tweet, final String name);
 
   void verifyIndex(final String collectionName);
 

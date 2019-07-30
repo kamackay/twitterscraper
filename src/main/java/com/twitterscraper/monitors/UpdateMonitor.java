@@ -59,9 +59,9 @@ public class UpdateMonitor extends AbstractMonitor {
   private void update(final long id, final String name) {
     twitter().getTweetSafe(id)
         .ifPresent(tweet -> {
-          db.upsert(tweet, name);
-          logger.info("Updated ID {} for Query {}",
-              id, name);
+          final int timesUpdated = db.upsert(tweet, name);
+          logger.info("Updated Tweet for Query {} - has been updated {} times",
+              name, timesUpdated);
         });
   }
 }
