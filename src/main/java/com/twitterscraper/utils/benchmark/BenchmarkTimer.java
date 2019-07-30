@@ -2,12 +2,12 @@ package com.twitterscraper.utils.benchmark;
 
 import com.twitterscraper.utils.Elective;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static com.twitterscraper.db.Transforms.millisToReadableTime;
+import static com.twitterscraper.utils.Utils.getLogger;
 import static com.twitterscraper.utils.benchmark.BenchmarkData.data;
 
 /**
@@ -18,7 +18,7 @@ public class BenchmarkTimer {
   private static BenchmarkTimer instance = null;
   private final Map<String, BenchmarkData> startTimes;
   private long limit = 0;
-  private Logger logger = LoggerFactory.getLogger(BenchmarkTimer.class.getSimpleName());
+  private Logger logger = getLogger(BenchmarkTimer.class);
 
   private BenchmarkTimer() {
     startTimes = new HashMap<>();

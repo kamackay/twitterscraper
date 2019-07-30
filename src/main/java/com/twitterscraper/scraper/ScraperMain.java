@@ -3,14 +3,15 @@ package com.twitterscraper.scraper;
 import com.google.inject.Guice;
 import com.twitterscraper.MainModule;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static com.twitterscraper.utils.Utils.getLogger;
 
 /**
  * Entry point class
  */
 public class ScraperMain {
 
-  private static Logger logger = LoggerFactory.getLogger(ScraperMain.class);
+  private static Logger logger = getLogger(ScraperMain.class);
 
   /**
    * Start up the Scraper Server

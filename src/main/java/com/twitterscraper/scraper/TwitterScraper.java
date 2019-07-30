@@ -4,14 +4,12 @@ import com.google.inject.Inject;
 import com.twitterscraper.Component;
 import com.twitterscraper.db.DatabaseWrapper;
 import com.twitterscraper.model.Config;
-import com.twitterscraper.model.Query;
 import com.twitterscraper.model.Query.StatusCheck;
 import com.twitterscraper.monitors.AbstractMonitor;
 import com.twitterscraper.monitors.UpdateMonitor;
 import com.twitterscraper.utils.Elective;
 import com.twitterscraper.utils.benchmark.Benchmark;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -22,8 +20,7 @@ import java.util.stream.Collectors;
 import static com.twitterscraper.db.Transforms.millisToReadableTime;
 import static com.twitterscraper.twitter.TwitterWrapper.getWaitTimeForQueries;
 import static com.twitterscraper.twitter.TwitterWrapper.twitter;
-import static com.twitterscraper.utils.Utils.formatBytes;
-import static com.twitterscraper.utils.Utils.padString;
+import static com.twitterscraper.utils.Utils.*;
 
 
 public class TwitterScraper extends Component {
@@ -32,7 +29,7 @@ public class TwitterScraper extends Component {
   private final Set<AbstractMonitor> monitors;
   private final UpdateMonitor updateMonitor;
   private final DatabaseWrapper db;
-  private Logger logger = LoggerFactory.getLogger(TwitterScraper.class);
+  private Logger logger = getLogger(TwitterScraper.class);
 
   @Inject
   TwitterScraper(

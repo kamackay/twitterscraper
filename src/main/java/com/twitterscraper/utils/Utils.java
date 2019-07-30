@@ -1,5 +1,8 @@
 package com.twitterscraper.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Arrays;
 
 public class Utils {
@@ -37,5 +40,13 @@ public class Utils {
     }
     if (start) builder.append(s);
     return builder.toString();
+  }
+
+  public static Logger getLogger(final Class<?> c) {
+    return getLogger(c.getSimpleName());
+  }
+
+  public static Logger getLogger(final String name) {
+    return LoggerFactory.getLogger(name);
   }
 }

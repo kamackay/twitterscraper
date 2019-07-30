@@ -12,7 +12,6 @@ import com.twitterscraper.utils.Elective;
 import com.twitterscraper.utils.benchmark.Benchmark;
 import org.bson.Document;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import twitter4j.Status;
 
 import java.util.*;
@@ -20,12 +19,13 @@ import java.util.concurrent.TimeUnit;
 
 import static com.mongodb.client.model.Filters.eq;
 import static com.twitterscraper.db.Transforms.*;
+import static com.twitterscraper.utils.Utils.getLogger;
 
 public class DatabaseWrapperImpl implements DatabaseWrapper {
 
   private static final long DEFAULT_LONG = -1;
   private final MongoDatabase db;
-  private Logger logger = LoggerFactory.getLogger(getClass());
+  private Logger logger = getLogger(DatabaseWrapperImpl.class);
   private Map<String, MongoCollection<Document>> collectionCache;
 
   @Inject

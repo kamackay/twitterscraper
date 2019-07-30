@@ -6,13 +6,13 @@ import com.twitterscraper.db.DatabaseWrapper;
 import io.javalin.Javalin;
 import org.bson.Document;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static com.twitterscraper.api.Api.getAsync;
+import static com.twitterscraper.utils.Utils.getLogger;
 import static io.javalin.apibuilder.ApiBuilder.path;
 
 public class Server extends Component {
-  private final Logger log = LoggerFactory.getLogger(this.getClass());
+  private final Logger log = getLogger(this.getClass());
 
   private final Javalin app;
   private final DatabaseWrapper db;

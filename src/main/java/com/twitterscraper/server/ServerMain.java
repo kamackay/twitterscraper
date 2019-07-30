@@ -2,10 +2,11 @@ package com.twitterscraper.server;
 
 import com.google.inject.Guice;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static com.twitterscraper.utils.Utils.getLogger;
 
 public class ServerMain {
-  private static Logger logger = LoggerFactory.getLogger(ServerMain.class);
+  private static Logger logger = getLogger(ServerMain.class);
 
   /**
    * Start up the Scraper Server

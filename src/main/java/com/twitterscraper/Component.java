@@ -1,11 +1,12 @@
 package com.twitterscraper;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static com.twitterscraper.utils.Utils.getLogger;
 
 public abstract class Component {
 
-  private Logger logger = LoggerFactory.getLogger(getClass());
+  private Logger logger = getLogger(getClass());
 
   /**
    * Run the Component

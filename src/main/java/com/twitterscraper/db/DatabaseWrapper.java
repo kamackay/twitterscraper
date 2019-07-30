@@ -20,6 +20,7 @@ public interface DatabaseWrapper {
   long sizeInBytes(final String collectionName);
 
   Collection<Document> getAll(final String collectionName, final Document filter);
+
   Collection<Document> getAll(final String collectionName);
 
   MongoCollection<Document> getCollection(final String name);

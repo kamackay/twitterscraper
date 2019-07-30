@@ -5,14 +5,13 @@ import com.twitterscraper.db.DatabaseWrapper;
 import com.twitterscraper.utils.Elective;
 import lombok.AccessLevel;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import twitter4j.QueryResult;
 import twitter4j.Status;
 
 import java.util.List;
 
 import static com.twitterscraper.twitter.TwitterWrapper.twitter;
-import static com.twitterscraper.utils.Utils.formatBytes;
+import static com.twitterscraper.utils.Utils.getLogger;
 
 @lombok.Data
 @lombok.Builder(toBuilder = true, builderClassName = "Builder", access = AccessLevel.PUBLIC)
@@ -20,7 +19,7 @@ import static com.twitterscraper.utils.Utils.formatBytes;
 @lombok.AllArgsConstructor(access = AccessLevel.PUBLIC)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Query implements ICloneable<Query> {
-  private static Logger logger = LoggerFactory.getLogger(Query.class);
+  private static Logger logger = getLogger(Query.class);
   private twitter4j.Query query;
   private QueryModel model;
 

@@ -3,16 +3,16 @@ package com.twitterscraper.model;
 import com.google.gson.Gson;
 import com.twitterscraper.utils.QueryBuilder;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.List;
 
+import static com.twitterscraper.utils.Utils.getLogger;
 import static java.util.stream.Collectors.toList;
 
 public class Config {
-  private static Logger logger = LoggerFactory.getLogger(Config.class);
+  private static Logger logger = getLogger(Config.class);
 
   public List<QueryModel> queries;
   public boolean runUpdater;

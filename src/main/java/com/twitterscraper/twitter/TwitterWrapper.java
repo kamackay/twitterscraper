@@ -5,7 +5,6 @@ import com.twitterscraper.utils.Elective;
 import com.twitterscraper.utils.Task;
 import com.twitterscraper.utils.benchmark.Benchmark;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import twitter4j.*;
 import twitter4j.conf.ConfigurationBuilder;
 
@@ -16,6 +15,7 @@ import java.util.function.Predicate;
 
 import static com.twitterscraper.db.Transforms.millisToReadableTime;
 import static com.twitterscraper.twitter.RateLimit.*;
+import static com.twitterscraper.utils.Utils.getLogger;
 import static com.twitterscraper.utils.Utils.padString;
 
 public class TwitterWrapper {
@@ -24,7 +24,7 @@ public class TwitterWrapper {
   private final Twitter twitter;
   private final Map<String, RateLimitStatus> limitMap;
   private final Semaphore sem = new Semaphore(1, true);
-  private Logger logger = LoggerFactory.getLogger(getClass());
+  private Logger logger = getLogger(TwitterWrapper.class);
   private int queryCount = 4;
 
   private TwitterWrapper() {
