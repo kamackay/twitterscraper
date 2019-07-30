@@ -52,8 +52,8 @@ public class UpdateMonitor extends AbstractMonitor {
         .map(document -> document.getLong(ID))
         .forEach(id -> this.update(id, name));
 
-    final long id = db.getMostRetweets(name);
-    this.update(id, name);
+//    final long id = db.getMostRetweets(name);
+//    this.update(id, name);
   }
 
   private void update(final long id, final String name) {
