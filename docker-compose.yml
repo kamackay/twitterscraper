@@ -1,0 +1,34 @@
+version: "2"
+
+services:
+  scraper:
+    build:
+      context: .
+    links:
+      - mongodb
+
+  server:
+    build:
+      context: .
+    links:
+      - mongodb
+    ports:
+      - 4568:8080
+    environment:
+      MODE: server
+
+  mongodb:
+    image: mongo:latest
+    volumes:
+      - DB:/data/db
+    restart: always
+    environment:
+      spring.data.mongodb.host: mongodb
+
+volumes:
+  DB:
+
+networks:
+  default:
+    external:
+      name: twitternet
