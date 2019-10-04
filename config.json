@@ -2,45 +2,38 @@
   "queries": [
     {
       "queryName": "TrumpMentions",
-      "mentions": [
-        "realDonaldTrump"
-      ],
+      "mentions": ["realDonaldTrump"],
       "updateExisting": true
     },
     {
       "queryName": "OcasioMentions",
-      "mentions": [
-        "AOC"
-      ],
+      "mentions": ["AOC"],
       "updateExisting": false
     },
     {
       "queryName": "maga",
-      "hashtags": [
-        "maga"
-      ],
+      "hashtags": ["maga"],
       "updateExisting": true
     },
     {
       "queryName": "ObamaMentions",
-      "mentions": [
-        "BarackObama"
-      ],
+      "mentions": ["BarackObama"],
       "updateExisting": true
     },
     {
       "queryName": "QuoteILove",
-      "quotes": [
-        "I Love"
-      ],
+      "quotes": ["I Love"],
       "updateExisting": false
     },
     {
       "queryName": "JackMentions",
-      "mentions": [
-        "jack"
-      ],
+      "mentions": ["jack"],
       "updateExisting": true
+    },
+    {
+      "queryName": "MyDog",
+      "quotes": ["My Dog"],
+      "updateExisting": false
     }
   ],
   "runUpdater": true
