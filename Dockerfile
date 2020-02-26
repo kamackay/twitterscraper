@@ -11,10 +11,15 @@ ADD ./ ./
 RUN mvn install && \
   cp target/*jar-with-dependencies.jar ./app.jar
 
-FROM ubuntu:latest
+#FROM ubuntu:latest
+#
+#RUN apt-get update && \
+#    apt-get install -y openjdk-11-jdk-headless
 
-RUN apt-get update && \
-    apt-get install -y openjdk-11-jdk-headless
+FROM alpine:latest
+
+RUN apk --update --no-cache upgrade && apk add \
+    openjdk11-jdk
 
 WORKDIR /app/
 
