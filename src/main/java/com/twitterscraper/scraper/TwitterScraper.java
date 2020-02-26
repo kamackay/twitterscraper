@@ -9,7 +9,7 @@ import com.twitterscraper.monitors.AbstractMonitor;
 import com.twitterscraper.monitors.UpdateMonitor;
 import com.twitterscraper.utils.Elective;
 import com.twitterscraper.utils.benchmark.Benchmark;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,16 +20,16 @@ import java.util.stream.Collectors;
 import static com.twitterscraper.db.Transforms.millisToReadableTime;
 import static com.twitterscraper.twitter.TwitterWrapper.getWaitTimeForQueries;
 import static com.twitterscraper.twitter.TwitterWrapper.twitter;
-import static com.twitterscraper.utils.Utils.*;
+import static com.twitterscraper.utils.Utils.formatBytes;
+import static com.twitterscraper.utils.Utils.padString;
 
-
+@Slf4j
 public class TwitterScraper extends Component {
 
   private final List<com.twitterscraper.model.Query> queries;
   private final Set<AbstractMonitor> monitors;
   private final UpdateMonitor updateMonitor;
   private final DatabaseWrapper db;
-  private Logger logger = getLogger(TwitterScraper.class);
 
   @Inject
   TwitterScraper(
@@ -67,9 +67,9 @@ public class TwitterScraper extends Component {
         .map(String::valueOf)
         .mapToInt(String::length)
         .max().orElse(0);
-    logger.info("Collection Statuses:");
+    log.info("Collection Statuses:");
     checks.forEach(check -> {
-      logger.info("\t{}: Records: {}, Size: {}",
+      log.info("\t{}: Records: {}, Size: {}",
           padString(check.getName(), longestName),
           padString(String.valueOf(check.getNumDocuments()), longestSize),
           formatBytes(check.getNumBytes()));
@@ -78,10 +78,10 @@ public class TwitterScraper extends Component {
 
     try {
       final long ms = getWaitTimeForQueries(queries.size());
-      logger.info("Waiting for {} to span out API requests", millisToReadableTime(ms));
+      log.info("Waiting for {} to span out API requests", millisToReadableTime(ms));
       Thread.sleep(ms);
     } catch (Exception e) {
-      logger.error("Error spacing out API Requests", e);
+      log.error("Error spacing out API Requests", e);
     }
   }
 
@@ -93,7 +93,7 @@ public class TwitterScraper extends Component {
     final long totalCount = checks.stream()
         .mapToLong(StatusCheck::getNumDocuments)
         .sum();
-    logger.info("Total Database size is {}, {} records", formatBytes(totalSize), totalCount);
+    log.info("Total Database size is {}, {} records", formatBytes(totalSize), totalCount);
   }
 
   @Benchmark(limit = 10)
@@ -101,10 +101,10 @@ public class TwitterScraper extends Component {
     Elective.ofNullable(Config.get())
         .ifPresent(config -> {
           monitors.remove(updateMonitor);
-          if (config.runUpdater) monitors.add(updateMonitor);
+          if(config.runUpdater) monitors.add(updateMonitor);
           setQueryList(config.convertQueries());
         })
-        .orElse(() -> logger.error("Could not load config"));
+        .orElse(() -> log.error("Could not load config"));
   }
 
   TwitterScraper setQueryList(final List<com.twitterscraper.model.Query> queries) {

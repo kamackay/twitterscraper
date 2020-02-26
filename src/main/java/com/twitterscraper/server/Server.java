@@ -2,25 +2,27 @@ package com.twitterscraper.server;
 
 import com.google.inject.Inject;
 import com.twitterscraper.Component;
-import com.twitterscraper.db.DatabaseWrapper;
+import com.twitterscraper.db.DatabaseWrapperImpl;
+import com.twitterscraper.model.Tuple;
 import io.javalin.Javalin;
 import org.bson.Document;
 import org.slf4j.Logger;
 
 import static com.twitterscraper.api.Api.getAsync;
 import static com.twitterscraper.utils.Utils.getLogger;
+import static io.javalin.apibuilder.ApiBuilder.delete;
 import static io.javalin.apibuilder.ApiBuilder.path;
 
 public class Server extends Component {
   private final Logger log = getLogger(this.getClass());
 
   private final Javalin app;
-  private final DatabaseWrapper db;
+  private final DatabaseWrapperImpl db;
 
   @Inject
   Server(
       final Javalin app,
-      final DatabaseWrapper db) {
+      final DatabaseWrapperImpl db) {
     this.app = app;
     this.db = db;
   }
@@ -36,7 +38,7 @@ public class Server extends Component {
             ctx.result(String.format("Could not find anything at \"%s\"" +
                 " - What were you hoping to find?", ctx.url())))
         .requestLogger((ctx, time) -> {
-          if (time > 10 || !"get".equals(ctx.method().toLowerCase())) {
+          if(time > 10 || !"get".equals(ctx.method().toLowerCase())) {
             log.info("{} on '{}' from {} took {}ms",
                 ctx.method(), ctx.path(), ctx.ip(), time);
           }
@@ -45,9 +47,21 @@ public class Server extends Component {
           path("collection", () -> {
             getAsync("/:name", ctx ->
                 this.db.getAll(ctx.pathParam("name")));
+            delete("/:name", ctx -> {
+              this.db.delete(ctx.pathParam("name"));
+            });
             getAsync("/:name/count", ctx ->
                 new Document("count",
                     this.db.count(ctx.pathParam("name"))));
+          });
+
+
+          getAsync("/", ctx -> {
+            final Document doc = new Document();
+            db.getCollections().parallelStream()
+                .map(name -> Tuple.of(name, this.db.count(name)))
+                .forEach(tuple -> doc.append(tuple.getLeft(), tuple.getRight()));
+            return doc;
           });
         })
         .start(8080);

@@ -1,11 +1,13 @@
 package com.twitterscraper.db;
 
+import com.google.inject.ImplementedBy;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import twitter4j.Status;
 
 import java.util.Collection;
 
+@ImplementedBy(DatabaseWrapperImpl.class)
 public interface DatabaseWrapper {
   long getMostRetweets(final String collectionName);
 

@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.twitterscraper.utils.Elective;
 import com.twitterscraper.utils.Task;
 import com.twitterscraper.utils.benchmark.Benchmark;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import twitter4j.Query;
 import twitter4j.QueryResult;
@@ -26,13 +27,13 @@ import static com.twitterscraper.twitter.RateLimit.STATUSES_SHOW;
 import static com.twitterscraper.utils.Utils.getLogger;
 import static com.twitterscraper.utils.Utils.padString;
 
+@Slf4j
 public class TwitterWrapper {
 
   private static TwitterWrapper instance = null;
   private final Twitter twitter;
   private final Map<String, RateLimitStatus> limitMap;
   private final Semaphore sem = new Semaphore(1, true);
-  private Logger logger = getLogger(TwitterWrapper.class);
   private int queryCount = 4;
 
   private TwitterWrapper() {
@@ -62,7 +63,7 @@ public class TwitterWrapper {
    * @return ms to wait
    */
   public static long getWaitTimeForQueries(final int queryCount) {
-    return Math.max((int) Math.pow(queryCount, 2), 60) * 1000;
+    return Math.max((int) Math.pow(queryCount, 2), 60) * 500;
   }
 
   protected TwitterWrapper setQueryCount(final int queryCount) {
@@ -103,10 +104,10 @@ public class TwitterWrapper {
       waitOnLimitSafe(SEARCH_TWEETS, 1);
       return Elective.of(search(query));
     } catch (TwitterException e) {
-      logger.error("Error searching Twitter", e);
+      log.error("Error searching Twitter", e);
       return Elective.empty();
     } catch (InterruptedException e) {
-      logger.error("Error acquiring semaphore", e);
+      log.error("Error acquiring semaphore", e);
       return Elective.empty();
     }
   }
@@ -130,11 +131,11 @@ public class TwitterWrapper {
         sem.acquire();
         limitMap.putAll(twitter.getRateLimitStatus());
       } catch (TwitterException e) {
-        logger.error("Error Resetting Limit Map", e);
+        log.error("Error Resetting Limit Map", e);
         Thread.sleep(60000); // Don't try again for 1 minute
       }
     } catch (InterruptedException e) {
-      logger.error("Error Acquiring semaphore", e);
+      log.error("Error Acquiring semaphore", e);
     } finally {
       sem.release();
     }
@@ -172,11 +173,11 @@ public class TwitterWrapper {
         return false;
       }
       RateLimitStatus status = limit.get();
-      if(log) logger.info("Limit {} is at {}", rateLimit.getName(), status.getRemaining());
+      if(log) this.log.info("Limit {} is at {}", rateLimit.getName(), status.getRemaining());
       if(status.getRemaining() <= minLimit) {
         final long sleep = status.getSecondsUntilReset() + 1;
         // Extra second to account for race conditions
-        logger.info("Sleeping for {} to refresh \"{}\" limit",
+        this.log.info("Sleeping for {} to refresh \"{}\" limit",
             millisToReadableTime(sleep * 1000),
             rateLimit.getName());
         if(sleep >= 0) Thread.sleep(sleep * 1000);
@@ -198,7 +199,7 @@ public class TwitterWrapper {
     try {
       return waitOnLimit(rateLimit, minLimit);
     } catch (InterruptedException e) {
-      logger.error("Error waiting on Limit", e);
+      log.error("Error waiting on Limit", e);
       return false;
     }
   }
@@ -259,7 +260,7 @@ public class TwitterWrapper {
         .filter(filter)
         .forEach(set -> {
           final RateLimitStatus limit = set.getValue();
-          logger.info("\tLimit: {}: {} - Resets in {} seconds",
+          log.info("\tLimit: {}: {} - Resets in {} seconds",
               padString(set.getKey(), longestName + 2),
               padString(String.valueOf(limit.getRemaining()), 6),
               padString(String.valueOf(limit.getSecondsUntilReset()), 4, true));

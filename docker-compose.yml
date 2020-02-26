@@ -6,18 +6,10 @@ services:
       context: .
     volumes: 
       - ./twitter4j.properties:/app/twitter4j.properties
-    links:
-      - twitterscraper-db
-
-  server:
-    build:
-      context: .
-    links:
-      - twitterscraper-db
     ports:
       - 4568:8080
-    environment:
-      MODE: server
+    links:
+      - twitterscraper-db
 
   twitterscraper-db:
     image: mongo:latest
