@@ -21,6 +21,5 @@ WORKDIR /api/
 COPY --from=builder /app/app.jar ./scraper.jar
 
 ADD config.json config.json
-ADD twitter4j.properties twitter4j.properties
 
 CMD ["java", "-jar", "scraper.jar"]
