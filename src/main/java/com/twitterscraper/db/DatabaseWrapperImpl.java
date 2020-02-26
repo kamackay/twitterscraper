@@ -32,6 +32,7 @@ public class DatabaseWrapperImpl implements DatabaseWrapper {
   DatabaseWrapperImpl() {
     final String host = Optional.ofNullable(System.getenv("DB_HOST"))
         .orElse("twitterscraper-db");
+    logger.info("Connecting to Mongo Host: {}", host);
     MongoClient client = MongoClients.create(MongoClientSettings.builder()
         .applyToClusterSettings(builder ->
             builder.hosts(Collections.singletonList(
