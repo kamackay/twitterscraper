@@ -4,3 +4,8 @@ output.log
 tweets.json
 .idea/*
 twitterscraper.iml
+secret.yml
+.classpath
+.factorypath
+.project
+.settings/

@@ -30,10 +30,13 @@ public class DatabaseWrapperImpl implements DatabaseWrapper {
 
   @Inject
   DatabaseWrapperImpl() {
+    final String host = Optional.ofNullable(System.getenv("DB_HOST"))
+        .orElse("twitterscraper-db");
+    logger.info("Connecting to Mongo Host: {}", host);
     MongoClient client = MongoClients.create(MongoClientSettings.builder()
         .applyToClusterSettings(builder ->
             builder.hosts(Collections.singletonList(
-                new ServerAddress("mongodb", 27017))))
+                new ServerAddress(host, 27017))))
         .build());
     db = client.getDatabase("TwitterScraper");
     this.collectionCache = new HashMap<>();
