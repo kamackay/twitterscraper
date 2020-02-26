@@ -35,7 +35,11 @@ spec:
         - name: regcred
       containers:
       - name: scraper
+        imagePullPolicy: Always
         image: registry.gitlab.com/kamackay/twitterscraper:latest
+        env:
+          - name: DB_HOST
+            value: twitterscraper-db.twitterscraper
         # resources:
         #   requests:
         #     memory: "128Mi"
