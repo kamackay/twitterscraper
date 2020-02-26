@@ -1,0 +1,119 @@
+---
+# SCRAPER
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: scraper
+  name: scraper
+  namespace: twitterscraper
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    service: scraper
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scraper
+  namespace: twitterscraper
+spec:
+  selector:
+    matchLabels:
+      app: scraper
+  template:
+    metadata:
+      labels:
+        app: scraper
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+      - name: scraper
+        image: registry.gitlab.com/kamackay/twitterscraper:latest
+        # resources:
+        #   requests:
+        #     memory: "128Mi"
+        #     cpu: "1m"
+        #   limits:
+        #     memory: "512Mi"
+        #     cpu: "5m"
+        volumeMounts:
+          - mountPath: /app/twitter4j.properties
+            subPath: twitter4j.properties
+            name: properties
+      volumes:
+        - name: properties
+          secret:
+              secretName: props-file
+
+---
+# DATABASE
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: twitterscraper-db
+  name: twitterscraper-db
+  namespace: twitterscraper
+spec:
+  type: ClusterIP
+  ports:
+    - name: db
+      port: 27017
+      targetPort: 27017
+  selector:
+    service: twitterscraper-db
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: twitterscraper-db
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 1Gi
+  hostPath:
+    path: /storage/twitterscraper
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: twitterscraper-db
+  namespace: twitterscraper
+spec:
+  serviceName: twitterscraper-db
+  selector:
+    matchLabels:
+      service: twitterscraper-db
+  template:
+    metadata:
+      labels:
+        service: twitterscraper-db
+    spec:
+      containers:
+        - name: mongo
+          image: mongo:latest
+          ports:
+            - name: db
+              containerPort: 27017
+          volumeMounts:
+            - name: twitterscraper-db
+              mountPath: /data/db
+  volumeClaimTemplates:
+    - spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+      metadata:
+        name: twitterscraper-db
+---

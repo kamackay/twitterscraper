@@ -33,7 +33,7 @@ public class DatabaseWrapperImpl implements DatabaseWrapper {
     MongoClient client = MongoClients.create(MongoClientSettings.builder()
         .applyToClusterSettings(builder ->
             builder.hosts(Collections.singletonList(
-                new ServerAddress("mongodb", 27017))))
+                new ServerAddress("twitterscraper-db", 27017))))
         .build());
     db = client.getDatabase("TwitterScraper");
     this.collectionCache = new HashMap<>();

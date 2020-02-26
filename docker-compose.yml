@@ -1,23 +1,25 @@
-version: "2"
+version: "3.1"
 
 services:
   scraper:
     build:
       context: .
+    volumes: 
+      - ./twitter4j.properties:/app/twitter4j.properties
     links:
-      - mongodb
+      - twitterscraper-db
 
   server:
     build:
       context: .
     links:
-      - mongodb
+      - twitterscraper-db
     ports:
       - 4568:8080
     environment:
       MODE: server
 
-  mongodb:
+  twitterscraper-db:
     image: mongo:latest
     volumes:
       - DB:/data/db

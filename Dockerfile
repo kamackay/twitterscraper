@@ -16,7 +16,7 @@ FROM ubuntu:latest
 RUN apt-get update && \
     apt-get install -y openjdk-11-jdk-headless
 
-WORKDIR /api/
+WORKDIR /app/
 
 COPY --from=builder /app/app.jar ./scraper.jar
 
