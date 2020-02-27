@@ -4,22 +4,21 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.twitterscraper.db.DatabaseWrapper;
 import com.twitterscraper.utils.Elective;
 import lombok.AccessLevel;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import twitter4j.QueryResult;
 import twitter4j.Status;
 
 import java.util.List;
 
 import static com.twitterscraper.twitter.TwitterWrapper.twitter;
-import static com.twitterscraper.utils.Utils.getLogger;
 
+@Slf4j
 @lombok.Data
 @lombok.Builder(toBuilder = true, builderClassName = "Builder", access = AccessLevel.PUBLIC)
 @lombok.NoArgsConstructor(force = true, access = AccessLevel.PUBLIC)
 @lombok.AllArgsConstructor(access = AccessLevel.PUBLIC)
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Query implements ICloneable<Query> {
-  private static Logger logger = getLogger(Query.class);
   private twitter4j.Query query;
   private QueryModel model;
 
@@ -44,12 +43,12 @@ public class Query implements ICloneable<Query> {
 
       final Elective<QueryResult> safeResult = twitter().searchSafe(this.getQuery());
       if (!safeResult.isPresent()) {
-        logger.error("Error fetching results for Query " + queryName);
+        log.error("Error fetching results for Query " + queryName);
         return;
       }
       safeResult.ifPresent(result -> this.handleResult(result, db));
     } catch (Exception e) {
-      logger.error("Error handling query " + queryName, e);
+      log.error("Error handling query " + queryName, e);
     }
   }
 
@@ -67,7 +66,7 @@ public class Query implements ICloneable<Query> {
         .filter(tweet -> db.upsert(tweet, this.getName()) > 0)
         .count();
     if (newTweets > 0)
-      logger.info("Query {} returned {} results, {} of which were new",
+      log.info("Query {} returned {} results, {} of which were new",
           this.getName(),
           tweets.size(),
           newTweets);

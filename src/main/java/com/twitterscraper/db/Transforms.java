@@ -2,8 +2,17 @@ package com.twitterscraper.db;
 
 import com.twitterscraper.utils.StringMaker;
 import com.twitterscraper.utils.TweetPrinter;
+import com.twitterscraper.utils.Utils;
+import lombok.val;
 import org.bson.Document;
-import twitter4j.*;
+import twitter4j.GeoLocation;
+import twitter4j.HashtagEntity;
+import twitter4j.MediaEntity;
+import twitter4j.Place;
+import twitter4j.Status;
+import twitter4j.URLEntity;
+import twitter4j.User;
+import twitter4j.UserMentionEntity;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -49,6 +58,7 @@ public class Transforms {
                 .map(Transforms::convert)
                 .collect(toList()))
         .append("place", convert(tweet.getPlace()))
+        .append("geo", convert(tweet.getGeoLocation()))
         .append("tweetURL", new TweetPrinter(tweet).getTweetUrl());
 
     Optional.ofNullable(tweet.getUser()).ifPresent(user -> {
@@ -59,7 +69,7 @@ public class Transforms {
   }
 
   private static Document convert(Place place) {
-    if (place == null) return null;
+    if(place == null) return null;
     return new Document("id", place.getId())
         .append("name", place.getName())
         .append("url", place.getURL())
@@ -69,8 +79,16 @@ public class Transforms {
         .append("streetAddress", place.getStreetAddress());
   }
 
+  private static Document convert(final GeoLocation location) {
+    if(location == null) {
+      return null;
+    }
+    return new Document("latitude", location.getLatitude())
+        .append("longitude", location.getLongitude());
+  }
+
   private static Document convert(final URLEntity e) {
-    if (e == null) return null;
+    if(e == null) return null;
     return new Document("expandedURL", e.getExpandedURL())
         .append("text", e.getText())
         .append("displayURL", e.getDisplayURL())
@@ -80,14 +98,14 @@ public class Transforms {
   }
 
   private static Document convert(final HashtagEntity e) {
-    if (e == null) return null;
+    if(e == null) return null;
     return new Document("text", e.getText())
         .append("start", e.getStart())
         .append("end", e.getEnd());
   }
 
   private static Document convert(final UserMentionEntity e) {
-    if (e == null) return null;
+    if(e == null) return null;
     return new Document("id", e.getId())
         .append("screenName", e.getScreenName())
         .append("text", e.getText())
@@ -98,7 +116,7 @@ public class Transforms {
   }
 
   private static Document convert(final MediaEntity e) {
-    if (e == null) return null;
+    if(e == null) return null;
     return new Document("id", e.getId())
         .append("mediaURL", e.getMediaURL())
         .append("mediaURLHttps", e.getMediaURLHttps())
@@ -111,7 +129,7 @@ public class Transforms {
   }
 
   private static Document convert(final User u) {
-    if (u == null) return null;
+    if(u == null) return null;
     return new Document("id", u.getId())
         .append("screenName", u.getScreenName())
         .append("name", u.getName())
@@ -128,12 +146,12 @@ public class Transforms {
     millis = readableTimeHelper(millis, MINUTE, "minutes", maker);
     millis = readableTimeHelper(millis, SECOND, "seconds", maker);
     readableTimeHelper(millis, 1, "ms", maker);
-    if (maker.isEmpty()) return "0 ms";
+    if(maker.isEmpty()) return "0 ms";
     return maker.toString().trim();
   }
 
   private static long readableTimeHelper(long time, long unit, String unitName, StringMaker builder) {
-    if (time >= unit) {
+    if(time >= unit) {
       builder.append(String.format("%d %s ", time / unit, unitName));
       return time % unit;
     } else return time;
