@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-file
+  namespace: twitterscraper
+data:
+  config.json: |
+    {
+      "queries": [
+        {
+          "queryName": "Trump",
+          "mentions": ["realDonaldTrump"],
+          "updateExisting": true
+        },
+        {
+          "queryName": "Trump",
+          "quotes": ["Trump"],
+          "updateExisting": true
+        },
+        {
+          "queryName": "Warren",
+          "mentions": ["ewarren"],
+          "updateExisting": true
+        },
+        {
+          "queryName": "Warren",
+          "quotes": ["Warren"],
+          "updateExisting": true
+        },
+        {
+          "queryName": "Buttigieg",
+          "mentions": ["PeteButtigieg"],
+          "updateExisting": true
+        },
+        {
+          "queryName": "Buttigieg",
+          "quotes": ["Buttigieg"],
+          "updateExisting": true
+        },
+        {
+          "queryName": "Bloomberg",
+          "mentions": ["MikeBloomberg"],
+          "updateExisting": true
+        },
+        {
+          "queryName": "Bloomberg",
+          "quotes": ["Bloomberg"],
+          "updateExisting": true
+        },
+        {
+          "queryName": "Biden",
+          "mentions": ["JoeBiden"],
+          "updateExisting": true
+        },
+        {
+          "queryName": "Biden",
+          "quotes": ["Biden"],
+          "updateExisting": true
+        },
+        {
+          "queryName": "Bernie",
+          "mentions": ["BernieSanders"],
+          "updateExisting": true
+        },
+        {
+          "queryName": "Bernie",
+          "quotes": ["Bernie"],
+          "updateExisting": true
+        },
+        {
+          "queryName": "Klobuchar",
+          "mentions": ["AmyKlobuchar"],
+          "updateExisting": true
+        },
+        {
+          "queryName": "Klobuchar",
+          "quotes": ["klobuchar"],
+          "updateExisting": true
+        }
+      ],
+      "runUpdater": true
+    }

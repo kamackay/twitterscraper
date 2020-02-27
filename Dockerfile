@@ -11,15 +11,20 @@ ADD ./ ./
 RUN mvn install && \
   cp target/*jar-with-dependencies.jar ./app.jar
 
-FROM ubuntu:latest
+#FROM ubuntu:latest
+#
+#RUN apt-get update && \
+#    apt-get install -y openjdk-11-jdk-headless
 
-RUN apt-get update && \
-    apt-get install -y openjdk-11-jdk-headless
+FROM alpine:latest
 
-WORKDIR /api/
+RUN apk --update --no-cache upgrade && apk add \
+    openjdk11-jdk
+
+WORKDIR /app/
 
 COPY --from=builder /app/app.jar ./scraper.jar
 
 ADD config.json config.json
 
-CMD ["java", "-jar", "scraper.jar"]
+CMD ["java", "-jar", "-Xmx400m", "-Xss200m", "scraper.jar"]

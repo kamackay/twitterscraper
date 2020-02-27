@@ -17,6 +17,7 @@ import twitter4j.Status;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static com.mongodb.client.model.Filters.eq;
 import static com.twitterscraper.db.Transforms.*;
 import static com.twitterscraper.utils.Utils.getLogger;
@@ -30,10 +31,13 @@ public class DatabaseWrapperImpl implements DatabaseWrapper {
 
   @Inject
   DatabaseWrapperImpl() {
+    final String host = Optional.ofNullable(System.getenv("DB_HOST"))
+        .orElse("twitterscraper-db");
+    logger.info("Connecting to Mongo Host: {}", host);
     MongoClient client = MongoClients.create(MongoClientSettings.builder()
         .applyToClusterSettings(builder ->
             builder.hosts(Collections.singletonList(
-                new ServerAddress("mongodb", 27017))))
+                new ServerAddress(host, 27017))))
         .build());
     db = client.getDatabase("TwitterScraper");
     this.collectionCache = new HashMap<>();
@@ -134,5 +138,14 @@ public class DatabaseWrapperImpl implements DatabaseWrapper {
         .estimatedDocumentCount(
             new EstimatedDocumentCountOptions()
                 .maxTime(2, TimeUnit.SECONDS));
+  }
+
+  @Benchmark(limit = 1000)
+  public Collection<String> getCollections() {
+    return db.listCollectionNames().into(newArrayList());
+  }
+
+  public void delete(final String collectionName) {
+    db.getCollection(collectionName).drop();
   }
 }

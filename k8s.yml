@@ -1,0 +1,182 @@
+---
+# SCRAPER
+apiVersion: v1
+kind: Service
+metadata:
+  name: scraper
+  namespace: twitterscraper
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: scraper
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scraper
+  namespace: twitterscraper
+  labels:
+    app: scraper
+spec:
+  selector:
+    matchLabels:
+      app: scraper
+  template:
+    metadata:
+      labels:
+        app: scraper
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+      - name: scraper
+        imagePullPolicy: Always
+        image: registry.gitlab.com/kamackay/twitterscraper:latest
+        env:
+          - name: DB_HOST
+            value: twitterscraper-db.twitterscraper
+          - name: PORT
+            value: "8080"
+        ports:
+          - name: http
+            containerPort: 8080
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 2
+        resources:
+          requests:
+            memory: "200Mi"
+            cpu: "100m"
+        volumeMounts:
+          - mountPath: /app/twitter4j.properties
+            subPath: twitter4j.properties
+            name: properties
+          - mountPath: /app/config.json
+            subPath: config.json
+            name: config
+      volumes:
+        - name: config
+          configMap:
+              name: config-file
+        - name: properties
+          secret:
+              secretName: props-file
+
+---
+# DATABASE
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: twitterscraper-db
+  name: twitterscraper-db
+  namespace: twitterscraper
+spec:
+  type: ClusterIP
+  ports:
+    - name: db
+      port: 27017
+      targetPort: 27017
+  selector:
+    service: twitterscraper-db
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: twitterscraper-db
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 1Gi
+  hostPath:
+    path: /storage/twitterscraper
+  persistentVolumeReclaimPolicy: Retain
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: twitterscraper-db
+  namespace: twitterscraper
+spec:
+  serviceName: twitterscraper-db
+  selector:
+    matchLabels:
+      service: twitterscraper-db
+  template:
+    metadata:
+      labels:
+        service: twitterscraper-db
+    spec:
+      containers:
+        - name: mongo
+          image: mongo:latest
+          ports:
+            - name: db
+              containerPort: 27017
+          volumeMounts:
+            - name: twitterscraper-db
+              mountPath: /data/db
+  volumeClaimTemplates:
+    - spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+      metadata:
+        name: twitterscraper-db
+---
+
+# INGRESS
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: twitter-ingress
+  namespace: twitterscraper
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+    - hosts:
+        - twitter.keithm.io
+      secretName: twitter-cert-secret
+  rules:
+    - host: twitter.keithm.io
+      http:
+        paths:
+          - backend:
+              serviceName: scraper
+              servicePort: 8080
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: twitter-com-ingress
+  namespace: twitterscraper
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+    - hosts:
+        - twitter.keithmackay.com
+      secretName: twitter-com-cert-secret
+  rules:
+    - host: twitter.keithmackay.com
+      http:
+        paths:
+          - backend:
+              serviceName: scraper
+              servicePort: 8080
+---

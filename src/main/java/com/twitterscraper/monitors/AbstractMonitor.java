@@ -12,7 +12,6 @@ import static com.twitterscraper.utils.Utils.getLogger;
 public abstract class AbstractMonitor {
 
   protected final DatabaseWrapper db;
-  protected final Logger logger = getLogger(AbstractMonitor.class);
   volatile List<Query> queries;
 
   public AbstractMonitor(final DatabaseWrapper db) {
