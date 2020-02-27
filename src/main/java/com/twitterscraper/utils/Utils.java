@@ -4,13 +4,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class Utils {
 
   public static String formatBytes(final long bytes) {
     double dbytes = (double) bytes;
     short unit = 0;
-    while (dbytes > 1024) {
+    while(dbytes > 1024) {
       dbytes /= 1024;
       unit++;
     }
@@ -34,11 +38,11 @@ public class Utils {
       final String s, final int length,
       final boolean start, final char c) {
     final StringBuilder builder = new StringBuilder();
-    if (!start) builder.append(s);
-    for (int x = 0; x < Math.max(length - s.length(), 0); x++) {
+    if(!start) builder.append(s);
+    for(int x = 0; x < Math.max(length - s.length(), 0); x++) {
       builder.append(c);
     }
-    if (start) builder.append(s);
+    if(start) builder.append(s);
     return builder.toString();
   }
 
@@ -48,5 +52,12 @@ public class Utils {
 
   public static Logger getLogger(final String name) {
     return LoggerFactory.getLogger(name);
+  }
+
+  public static <T> Predicate<T> distinctByKey(
+      Function<? super T, ?> keyExtractor) {
+
+    Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+    return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
   }
 }

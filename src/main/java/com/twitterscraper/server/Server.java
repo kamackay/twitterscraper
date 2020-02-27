@@ -5,19 +5,25 @@ import com.twitterscraper.Component;
 import com.twitterscraper.db.DatabaseWrapperImpl;
 import com.twitterscraper.model.Tuple;
 import io.javalin.Javalin;
+import lombok.extern.slf4j.Slf4j;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import org.bson.Document;
-import org.slf4j.Logger;
+
+import java.util.Objects;
 
 import static com.twitterscraper.api.Api.getAsync;
-import static com.twitterscraper.utils.Utils.getLogger;
 import static io.javalin.apibuilder.ApiBuilder.delete;
+import static io.javalin.apibuilder.ApiBuilder.get;
 import static io.javalin.apibuilder.ApiBuilder.path;
 
+@Slf4j
 public class Server extends Component {
-  private final Logger log = getLogger(this.getClass());
 
   private final Javalin app;
   private final DatabaseWrapperImpl db;
+  private final OkHttpClient httpClient = new OkHttpClient();
 
   @Inject
   Server(
@@ -62,6 +68,11 @@ public class Server extends Component {
                 .map(name -> Tuple.of(name, this.db.count(name)))
                 .forEach(tuple -> doc.append(tuple.getLeft(), tuple.getRight()));
             return doc;
+          });
+
+          get("/favicon.ico", ctx -> {
+            final String url = "https://developer.twitter.com/favicon.ico";
+            ctx.redirect(url);
           });
         })
         .start(8080);

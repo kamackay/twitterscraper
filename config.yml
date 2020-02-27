@@ -19,7 +19,7 @@ data:
         },
         {
           "queryName": "Warren",
-          "mentions": ["SenWarren"],
+          "mentions": ["ewarren"],
           "updateExisting": true
         },
         {

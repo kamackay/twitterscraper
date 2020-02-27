@@ -27,4 +27,4 @@ COPY --from=builder /app/app.jar ./scraper.jar
 
 ADD config.json config.json
 
-CMD ["java", "-jar", "scraper.jar"]
+CMD ["java", "-jar", "-Xmx400m", "-Xss200m","scraper.jar"]

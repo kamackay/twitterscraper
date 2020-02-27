@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.twitterscraper.Component;
 import com.twitterscraper.db.DatabaseWrapper;
 import com.twitterscraper.model.Config;
+import com.twitterscraper.model.Query;
 import com.twitterscraper.model.Query.StatusCheck;
 import com.twitterscraper.monitors.AbstractMonitor;
 import com.twitterscraper.monitors.UpdateMonitor;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 import static com.twitterscraper.db.Transforms.millisToReadableTime;
 import static com.twitterscraper.twitter.TwitterWrapper.getWaitTimeForQueries;
 import static com.twitterscraper.twitter.TwitterWrapper.twitter;
+import static com.twitterscraper.utils.Utils.distinctByKey;
 import static com.twitterscraper.utils.Utils.formatBytes;
 import static com.twitterscraper.utils.Utils.padString;
 
@@ -54,6 +56,7 @@ public class TwitterScraper extends Component {
 
     twitter().logAllLimits();
     List<StatusCheck> checks = queries.stream()
+        .filter(distinctByKey(Query::getName))
         .map(query -> query.status(db))
         .collect(Collectors.toList());
 

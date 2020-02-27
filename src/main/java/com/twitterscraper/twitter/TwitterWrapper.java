@@ -104,7 +104,7 @@ public class TwitterWrapper {
       waitOnLimitSafe(SEARCH_TWEETS, 1);
       return Elective.of(search(query));
     } catch (TwitterException e) {
-      log.error("Error searching Twitter", e);
+      log.error("Error searching Twitter with Query: {}", query.toString(), e);
       return Elective.empty();
     } catch (InterruptedException e) {
       log.error("Error acquiring semaphore", e);
