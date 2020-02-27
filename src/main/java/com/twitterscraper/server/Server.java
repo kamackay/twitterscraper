@@ -7,11 +7,13 @@ import com.twitterscraper.model.Tuple;
 import com.twitterscraper.utils.CachedObject;
 import io.javalin.Javalin;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.bson.Document;
 
+import java.io.ByteArrayInputStream;
 import java.util.Objects;
 
 import static com.twitterscraper.api.Api.getAsync;
@@ -25,6 +27,8 @@ public class Server extends Component {
   private final Javalin app;
   private final DatabaseWrapperImpl db;
   private final CachedObject<Document> countCache;
+  private final CachedObject<byte[]> iconCache;
+  private final OkHttpClient httpClient = new OkHttpClient();
 
   @Inject
   Server(
@@ -32,7 +36,8 @@ public class Server extends Component {
       final DatabaseWrapperImpl db) {
     this.app = app;
     this.db = db;
-    this.countCache = CachedObject.from(this::getCount);
+    this.countCache = CachedObject.from(this::getCount, 30000, Document.class);
+    this.iconCache = CachedObject.from(this::getIcon, 60000, byte[].class);
   }
 
   @Override
@@ -67,8 +72,7 @@ public class Server extends Component {
           getAsync("/", ctx -> countCache.getCurrent());
 
           get("/favicon.ico", ctx -> {
-            final String url = "https://developer.twitter.com/favicon.ico";
-            ctx.redirect(url);
+            ctx.contentType("x-icon").result(new ByteArrayInputStream(iconCache.getCurrent()));
           });
         })
         .start(8080);
@@ -80,6 +84,24 @@ public class Server extends Component {
         .map(name -> Tuple.of(name, this.db.count(name)))
         .forEach(tuple -> doc.append(tuple.getLeft(), tuple.getRight()));
     return doc;
+  }
+
+  private byte[] getIcon() {
+    final String url = "https://developer.twitter.com/favicon.ico";
+    try (final Response response = httpClient.newCall(new Request.Builder()
+        .url(url)
+        .get()
+        .build())
+        .execute()) {
+      val body = response.body();
+      if (body == null) {
+        return null;
+      }
+      return body.bytes();
+    } catch (Exception e) {
+      log.error("Error Getting Favicon", e);
+      return null;
+    }
   }
 
   @Override
