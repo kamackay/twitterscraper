@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.twitterscraper.Component;
 import com.twitterscraper.db.DatabaseWrapperImpl;
 import com.twitterscraper.model.Tuple;
+import com.twitterscraper.utils.CachedObject;
 import io.javalin.Javalin;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
@@ -23,7 +24,7 @@ public class Server extends Component {
 
   private final Javalin app;
   private final DatabaseWrapperImpl db;
-  private final OkHttpClient httpClient = new OkHttpClient();
+  private final CachedObject<Document> countCache;
 
   @Inject
   Server(
@@ -31,6 +32,7 @@ public class Server extends Component {
       final DatabaseWrapperImpl db) {
     this.app = app;
     this.db = db;
+    this.countCache = CachedObject.from(this::getCount);
   }
 
   @Override
@@ -62,13 +64,7 @@ public class Server extends Component {
           });
 
 
-          getAsync("/", ctx -> {
-            final Document doc = new Document();
-            db.getCollections().parallelStream()
-                .map(name -> Tuple.of(name, this.db.count(name)))
-                .forEach(tuple -> doc.append(tuple.getLeft(), tuple.getRight()));
-            return doc;
-          });
+          getAsync("/", ctx -> countCache.getCurrent());
 
           get("/favicon.ico", ctx -> {
             final String url = "https://developer.twitter.com/favicon.ico";
@@ -76,6 +72,14 @@ public class Server extends Component {
           });
         })
         .start(8080);
+  }
+
+  private Document getCount() {
+    final Document doc = new Document();
+    db.getCollections().parallelStream()
+        .map(name -> Tuple.of(name, this.db.count(name)))
+        .forEach(tuple -> doc.append(tuple.getLeft(), tuple.getRight()));
+    return doc;
   }
 
   @Override

@@ -14,7 +14,7 @@ data:
         },
         {
           "queryName": "Trump",
-          "quote": ["Trump"],
+          "quotes": ["Trump"],
           "updateExisting": true
         },
         {
@@ -24,7 +24,7 @@ data:
         },
         {
           "queryName": "Warren",
-          "quote": ["Warren"],
+          "quotes": ["Warren"],
           "updateExisting": true
         },
         {
@@ -34,7 +34,7 @@ data:
         },
         {
           "queryName": "Buttigieg",
-          "quote": ["Buttigieg"],
+          "quotes": ["Buttigieg"],
           "updateExisting": true
         },
         {
@@ -44,7 +44,7 @@ data:
         },
         {
           "queryName": "Bloomberg",
-          "quote": ["Bloomberg"],
+          "quotes": ["Bloomberg"],
           "updateExisting": true
         },
         {
@@ -54,7 +54,7 @@ data:
         },
         {
           "queryName": "Biden",
-          "Quote": ["Biden"],
+          "quote": ["Biden"],
           "updateExisting": true
         },
         {
@@ -64,7 +64,7 @@ data:
         },
         {
           "queryName": "Bernie",
-          "quote": ["Bernie"],
+          "quotes": ["Bernie"],
           "updateExisting": true
         },
         {
@@ -74,7 +74,7 @@ data:
         },
         {
           "queryName": "Klobuchar",
-          "quote": ["klobuchar"],
+          "quotes": ["klobuchar"],
           "updateExisting": true
         }
       ],

@@ -8,9 +8,11 @@ import com.twitterscraper.model.Query;
 import com.twitterscraper.model.Query.StatusCheck;
 import com.twitterscraper.monitors.AbstractMonitor;
 import com.twitterscraper.monitors.UpdateMonitor;
+import com.twitterscraper.utils.CachedObject;
 import com.twitterscraper.utils.Elective;
 import com.twitterscraper.utils.benchmark.Benchmark;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.Document;
 
 import java.util.ArrayList;
 import java.util.HashSet;

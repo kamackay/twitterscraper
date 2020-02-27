@@ -7,6 +7,7 @@ import com.twitterscraper.model.Config;
 import com.twitterscraper.model.Query;
 import com.twitterscraper.twitter.TwitterWrapper;
 import com.twitterscraper.utils.benchmark.Benchmark;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,6 +16,7 @@ import static com.twitterscraper.db.Transforms.ID;
 import static com.twitterscraper.twitter.RateLimit.STATUSES_SHOW;
 import static com.twitterscraper.twitter.TwitterWrapper.twitter;
 
+@Slf4j
 public class UpdateMonitor extends AbstractMonitor {
 
   @Inject
@@ -39,7 +41,7 @@ public class UpdateMonitor extends AbstractMonitor {
               limit.getSecondsUntilReset() * 1000 <=
                   TwitterWrapper.getWaitTimeForQueries(config.queries.size())) {
             final int n = limit.getRemaining() / config.queries.size();
-            logger.info("Burn through the remaining {} requests for {}", n, name);
+            log.info("Burn through the remaining {} requests for {}", n, name);
             return n;
           }
           return limit.getRemaining() / 100;
@@ -60,7 +62,7 @@ public class UpdateMonitor extends AbstractMonitor {
     twitter().getTweetSafe(id)
         .ifPresent(tweet -> {
           final int timesUpdated = db.upsert(tweet, name);
-          logger.info("Updated Tweet for Query {} - has been updated {} times",
+          log.debug("Updated Tweet for Query {} - has been updated {} times",
               name, timesUpdated);
         });
   }

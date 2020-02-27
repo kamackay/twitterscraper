@@ -52,6 +52,10 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 5
           timeoutSeconds: 2
+        resources:
+          requests:
+            memory: "200Mi"
+            cpu: "100m"
         volumeMounts:
           - mountPath: /app/twitter4j.properties
             subPath: twitter4j.properties
