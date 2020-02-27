@@ -14,7 +14,6 @@ import okhttp3.Response;
 import org.bson.Document;
 
 import java.io.ByteArrayInputStream;
-import java.util.Objects;
 
 import static com.twitterscraper.api.Api.getAsync;
 import static io.javalin.apibuilder.ApiBuilder.delete;
@@ -68,8 +67,14 @@ public class Server extends Component {
                     this.db.count(ctx.pathParam("name"))));
           });
 
-
-          getAsync("/", ctx -> countCache.getCurrent());
+          get("/", ctx -> {
+            final StringBuilder builder = new StringBuilder();
+            val curr = countCache.getCurrent();
+            curr.forEach((key, value) -> {
+              builder.append(key).append(": ").append(value).append("\n");
+            });
+            ctx.result(builder.toString());
+          });
 
           get("/favicon.ico", ctx -> {
             ctx.contentType("x-icon").result(new ByteArrayInputStream(iconCache.getCurrent()));
@@ -94,7 +99,7 @@ public class Server extends Component {
         .build())
         .execute()) {
       val body = response.body();
-      if (body == null) {
+      if(body == null) {
         return null;
       }
       return body.bytes();
