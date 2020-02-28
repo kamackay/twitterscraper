@@ -8,6 +8,7 @@ import com.twitterscraper.utils.CachedObject;
 import io.javalin.Javalin;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import io.javalin.plugin.rendering.template.JavalinPebble;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -19,21 +20,18 @@ import static com.twitterscraper.api.Api.getAsync;
 import static io.javalin.apibuilder.ApiBuilder.delete;
 import static io.javalin.apibuilder.ApiBuilder.get;
 import static io.javalin.apibuilder.ApiBuilder.path;
+import static io.javalin.plugin.rendering.template.TemplateUtil.model;
 
 @Slf4j
 public class Server extends Component {
 
-  private final Javalin app;
   private final DatabaseWrapperImpl db;
   private final CachedObject<Document> countCache;
   private final CachedObject<byte[]> iconCache;
   private final OkHttpClient httpClient = new OkHttpClient();
 
   @Inject
-  Server(
-      final Javalin app,
-      final DatabaseWrapperImpl db) {
-    this.app = app;
+  Server(final DatabaseWrapperImpl db) {
     this.db = db;
     this.countCache = CachedObject.from(this::getCount, 30000, Document.class);
     this.iconCache = CachedObject.from(this::getIcon, 60000, byte[].class);
@@ -41,20 +39,19 @@ public class Server extends Component {
 
   @Override
   public void start() {
-    this.app
-        .enableMicrometer()
-        .enableCorsForAllOrigins()
-        .enableCaseSensitiveUrls()
-        .enableRouteOverview("help")
+    Javalin.create(config -> {
+      config.enableCorsForAllOrigins();
+      config.addStaticFiles("/static");
+      config.requestLogger((ctx, time) -> {
+        if (time > 10 || !"get".equals(ctx.method().toLowerCase())) {
+          log.info("{} on '{}' from {} took {}ms",
+              ctx.method(), ctx.path(), ctx.ip(), time);
+        }
+      });
+    })
         .error(404, ctx ->
             ctx.result(String.format("Could not find anything at \"%s\"" +
                 " - What were you hoping to find?", ctx.url())))
-        .requestLogger((ctx, time) -> {
-          if(time > 10 || !"get".equals(ctx.method().toLowerCase())) {
-            log.info("{} on '{}' from {} took {}ms",
-                ctx.method(), ctx.path(), ctx.ip(), time);
-          }
-        })
         .routes(() -> {
           path("collection", () -> {
             getAsync("/:name", ctx ->
@@ -68,12 +65,9 @@ public class Server extends Component {
           });
 
           get("/", ctx -> {
-            final StringBuilder builder = new StringBuilder();
-            val curr = countCache.getCurrent();
-            curr.forEach((key, value) -> {
-              builder.append(key).append(": ").append(value).append("\n");
-            });
-            ctx.result(builder.toString());
+            ctx.render("/templates/index.vm",
+                model("counts",
+                    countCache.getCurrent().entrySet()));
           });
 
           get("/favicon.ico", ctx -> {
@@ -99,7 +93,7 @@ public class Server extends Component {
         .build())
         .execute()) {
       val body = response.body();
-      if(body == null) {
+      if (body == null) {
         return null;
       }
       return body.bytes();

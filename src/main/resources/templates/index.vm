@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Twitter Analytics</title>
+    <link href="/css/main.css" rel="stylesheet"/>
+    <link href="/css/bootstrap.min.css" rel="stylesheet"/>
+</head>
+<body style="background-color: black">
+    <div class="container">
+        <h1>Current Statistics</h1>
+        <div class="values">
+            #foreach($entry in $counts)
+                <h4 class="value">$entry.getKey(): $entry.getValue()</h4>
+            #end
+        </div>
+    </div>
+</body>
+</html>

@@ -1,7 +1,7 @@
 package com.twitterscraper.api;
 
-import io.javalin.Context;
 import io.javalin.apibuilder.ApiBuilder;
+import io.javalin.http.Context;
 import org.bson.Document;
 
 import java.util.Map;
